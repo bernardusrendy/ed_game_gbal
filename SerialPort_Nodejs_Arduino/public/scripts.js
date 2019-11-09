@@ -85,7 +85,7 @@ function onMessageArrived(msg) {
       gen3.button=sdata[4];gen3.limit_switch=sdata[5];
       gen4.button=sdata[6];gen4.limit_switch=sdata[7];
       gen5.button=sdata[8];gen5.limit_switch=sdata[9];
-      gen6.button=sdata[10];gen6.limit_switch=sdata[11];g
+      gen6.button=sdata[10];gen6.limit_switch=sdata[11];
       supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)
               +checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
       console.log(supply);
