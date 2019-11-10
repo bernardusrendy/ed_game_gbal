@@ -1,5 +1,8 @@
 #include "FastLED.h"
-#define NUM_LEDS 9 //LED Amount per Generator
+
+#define NUM_LEDS             9 //LED Amount per Generator
+#define BRIGHTNESS          96
+#define FRAMES_PER_SECOND  120
 
 #define pin_button1 A0
 #define pin_limit_switch1 A1
@@ -40,6 +43,16 @@ Generator gen4 = {0,0,pin_button4,pin_limit_switch4,"offline",pin_lights4};
 Generator gen5 = {0,0,pin_button5,pin_limit_switch5,"offline",pin_lights5};
 Generator gen6 = {0,0,pin_button6,pin_limit_switch6,"offline",pin_lights6};
 
+// FastLED custom light
+uint8_t gHue = 0;
+void sinelon(CRGB *leds)
+{
+  // a colored dot sweeping back and forth, with fading trails
+  fadeToBlackBy( leds, NUM_LEDS, 20);
+  int pos = beatsin16(13,0,NUM_LEDS);
+  leds[pos] += CHSV( gHue, 255, 192);
+}
+
 // Output Lights Actuator
 void lights(Generator generator){
   if (generator.state=="offline"){
@@ -49,7 +62,8 @@ void lights(Generator generator){
     FastLED.show();
   }
   else if (generator.state=="transient"){
-    
+    sinelon(generator.led_array);
+    FastLED.show();
   }
   else if (generator.state=="steady"){
     for(int i=0; i<NUM_LEDS; i++){
@@ -139,6 +153,7 @@ void setup() {
   FastLED.addLeds<WS2812, pin_lights4>(gen4.led_array, NUM_LEDS);
   FastLED.addLeds<WS2812, pin_lights5>(gen5.led_array, NUM_LEDS);
   FastLED.addLeds<WS2812, pin_lights6>(gen6.led_array, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
 }
 
 void loop() {
@@ -155,27 +170,28 @@ void loop() {
   lights(gen4);
   lights(gen5);
   lights(gen6);
-  Serial.print(gen1.button);
-  Serial.print(",");
-  Serial.print(gen1.limit_switch);
-  Serial.print(",");
-  Serial.print(gen2.button);
-  Serial.print(",");
-  Serial.print(gen2.limit_switch);
-  Serial.print(",");
-  Serial.print(gen3.button);
-  Serial.print(",");
-  Serial.print(gen3.limit_switch);
-  Serial.print(",");
-  Serial.print(gen4.button);
-  Serial.print(",");
-  Serial.print(gen4.limit_switch);
-  Serial.print(",");
-  Serial.print(gen5.button);
-  Serial.print(",");
-  Serial.print(gen5.limit_switch);
-  Serial.print(",");
-  Serial.print(gen6.button);
-  Serial.print(",");
-  Serial.println(gen6.limit_switch);
+  if(
+    Serial.print(gen1.button);
+    Serial.print(",");
+    Serial.print(gen1.limit_switch);
+    Serial.print(",");
+    Serial.print(gen2.button);
+    Serial.print(",");
+    Serial.print(gen2.limit_switch);
+    Serial.print(",");
+    Serial.print(gen3.button);
+    Serial.print(",");
+    Serial.print(gen3.limit_switch);
+    Serial.print(",");
+    Serial.print(gen4.button);
+    Serial.print(",");
+    Serial.print(gen4.limit_switch);
+    Serial.print(",");
+    Serial.print(gen5.button);
+    Serial.print(",");
+    Serial.print(gen5.limit_switch);
+    Serial.print(",");
+    Serial.print(gen6.button);
+    Serial.print(",");
+    Serial.println(gen6.limit_switch);
 }

@@ -1,99 +1,82 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Client Js -->
+    <script type="text/javascript" src="./scripts.js"></script>
+    <!-- Client CSS -->
+    <link rel="stylesheet" href="./style.css" /> 
 
-<head>
-  <title>Tugas UTS TF4061 Industrial Internet of Things Kelompok 01</title> <!--create title in webpage-->
-  <link rel="stylesheet" href="./style.css" /> 
-  <script src="./plotly-latest.min.js"></script>
-  <script src="./mqttws31.js" type="text/javascript"></script>
-  <link rel="stylesheet" href="./bootstrap.min.css">
-  <script src="./jquery-3.3.1.slim.min.js"></script>
-  <script src="./popper.min.js"></script>
-  <script src="./bootstrap.min.js"></script>
-  <script type="text/javascript" src="./scripts.js"></script>
-  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-  <div class="text-center" style="background: #343a40; color: white; font-family: Roboto; font-size: 36px;">TUGAS UTS TF4061 INDUSTRIAL INTERNET OF THINGS KELOMPOK 01</div>
-  <!-- GAUGE FEATURE -->
-  <div class="row"> <!--Divide the main page into a few row for the web feature-->
-    <div class="col-4 mt-4"> <!--Define the location of web feature-->
-      <div class="box"> <!--Create a box for the web feature-->
-        <div class="wrapper fadeInDown px-4" id="formContent">
-          <div class="mt-4" style="color: white; font-family: Roboto; font-size: 36px;"> Light Intensity (Lux) </div> <!--Create Tittle for the feature-->
-          <div class="sc-gauge fadeIn first" ;> <!--Create gauge scale feature in webpage---->
-            <div class="sc-background">
-              <div id="ldrvaluerot" class="sc-percentage"></div>
-              <div class="sc-mask"></div>
-              <span class="sc-value"> 
-                <div id="avgGauge" style="color: white; font-size: 20px;"></div> <!--Display the value that pointed by the gauge-->
-              </span>
-            </div>
-            <span class="sc-min" style="color: white; font-family: Roboto">0</span> <!--Define the beginning value of gauge-->
-            <span class="sc-max" style="color: white; font-family: Roboto">500</span> <!--Define the end value of gauge-->
-          </div>
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-light">
+      <span class="navbar-brand mb-0 h1">Day </span>
+      <a class="navbar-text" href="#">2</a>
+      <a class="navbar-text" href="#">/5</a>
+    </nav>
+    <div class="progress" style="height: 100px">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 10%"></div>
+    </div>
+    <div class="containers">
+      <div class="row">
+        <div class="col-sm">
+          <h3>Supply</h3>
+          <h1>2</h1>
+        </div>
+        <div class="col-sm">
+          <h3>Demand</h3>
+          <h1>17</h1>
         </div>
       </div>
     </div>
-    <!-- BUTTON FEATURE -->
-    <div class="col-4 mt-4"> <!--Define the location of the feature-->
-      <div class="box"> <!--Create box for the web feature-->
-        <div class="wrapper fadeInDown pb-3" id="formContent">
-          <div class="mt-4" style="color: white; font-family: Roboto; font-size: 36px;"> BUTTON STATUS </div> <!--Create tittle for web feature-->
-          <div id="butAutoManual" class="indicators pt-4 p-1" onclick="changeStatus1();">AUTO</div> <!--Create a round button with a certain command to perform-->
-          <div id="butLED" class="indicators pt-4 p-1" onclick="changeStatus2();">ON/OFF</div> <!--Create a round button with a certain command to perform-->
-          <div id="butLEDRGB" class="indicators pt-3 p-1" onclick="changeStatus3();">ON/OFF RGB</div> <!--Create a round button with a certain command to perform-->
-          <div class="pb-4 mb-1"></div> <!--Set the location of the button-->
-        </div>
-      </div>
-    </div>
-    <!-- SLIDER RGB -->
-    <div class="col-4 mt-4"> <!--Define the location of the feature-->
-      <div class="box"> <!--Create box for the web feature-->
-        <div class="wrapper fadeInDown" id="formContent">
-          <div class="mt-4" style="color: white; font-family: Roboto; font-size: 36px;"> RGB PARAMETER </div> <!--Create title for the web feature-->
-          <div class="row mt-5 pt-5"> <!--Divide the box into a certain length-->
-            <div class="col-3 ml-1"> <!--Define the location of the slider-->
-              <input type="range" min="0" max="255" value="50" class="sliderRGB R" id="sliderR"/> <!--Create a slider with a certain minimum and maximum value-->
-              <div class="mt-5 mb-5 pt-4"></div>
-              <div class="ml-5 pl-5" style="color: white; font-family: Roboto; font-size: 18px;">Red</div>
-              <div class="ml-5 pl-5 pb-3" id="sliderValR" style="color: white; font-family: Roboto; font-size: 18px;"></div> <!--Show the value of the slider-->
-            </div>
-            <div class="col-3"><!--Define the location of the slider-->
-              <input type="range" min="0" max="255" value="50" class="sliderRGB G" id="sliderG"/> <!--Create a slider with a certain minimum and maximum value-->
-              <div class="mt-5 mb-5 pt-4"></div>
-              <div class="ml-5 pl-5" style="color: white; font-family: Roboto; font-size: 18px;">Green</div>
-              <div class="ml-5 pl-5 pb-3" id="sliderValG" style="color: white; font-family: Roboto; font-size: 18px;"></div> <!--Show the value of the slider-->
-            </div> 
-            <div class="col-3"><!--Define the location of the slider-->
-              <input type="range" min="0" max="255" value="50" class="sliderRGB B" id="sliderB"/> <!--Create a slider with a certain minimum and maximum value-->
-              <div class="mt-5 mb-5 pt-4"></div>
-              <div class="ml-5 pl-5" style="color: white; font-family: Roboto; font-size: 18px;">Blue</div>
-              <div class="ml-5 pl-5 pb-3" id="sliderValB" style="color: white; font-family: Roboto; font-size: 18px;"></div> <!--Show the value of the slider-->
-            </div>  
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <!-- SLIDER THRESHOLD -->
-    <div class="col-12 fadeIn first alarm-threshold"> <!--Define the position of the web feature-->
-      <div class="alarm-threshold" style="color: white; font-family: Roboto; font-size: 36px;"> <!--Create a tittle for web feature with certain settings-->
-        ALARM THRESHOLD
-      </div>
-      <div class="center"> 
-        <input type="range" min="0" max="500" value="50" class="slider" id="sliderThreshold"/> <!--Create a slider with a certain minimum and maximum value-->
-      </div> 
-      <div style="color: white; font-family: Roboto; font-size: 24px;"> <!--Create a tittle for web feature with certain settings-->
-        Threshold: <span id="sliderValThreshold"></span> 
-      </div>
-    </div>
-    <!-- ALARM -->
-    <div id="alarm" class="alarmC"></div> <!--Create a web feature for ALARM-->
-  </div>
-</body>
+    <div class="progress">
+      <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">1</div>
+      <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">2</div>
+      <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">3</div>
+      <div class="progress-bar bg-danger" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">4</div>
 
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm">
+          <h4>Generator 1</h4>
+          <h2>3</h2>
+        </div>
+        <div class="col-sm">
+          <h4>Generator 2</h4>
+          <h2>7</h2>
+        </div>
+        <div class="col-sm">
+          <h4>Generator 3</h4>
+          <h2>5</h2>
+        </div>
+        <div class="col-sm">
+          <h4>Generator 4</h4>
+          <h2>5</h2>
+        </div>
+        <div class="col-sm">
+          <h4>Generator 5</h4>
+          <h2>2</h2>
+        </div>
+        <div class="col-sm">
+          <h4>Generator 6</h4>
+          <h2>6</h2>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">  
+    </script>
+  </body>
 </html>

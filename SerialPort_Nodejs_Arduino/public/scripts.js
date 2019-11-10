@@ -5,8 +5,6 @@
 // Protocol used for serialOut:
 // (state1,state2,state3,state4,state5,state6)
 
-
-
 // Game Variables
 var supply;
 var demand;
@@ -15,13 +13,14 @@ var grid_phase;
 
 // Class Declaration
 class Generator {
-  constructor(power,fail_chance,number,state,button,limit_switch) {
+  constructor(power,fail_chance,number,state,button,limit_switch,transient_time) {
     this.power = power;
     this.fail_chance = fail_chance;
     this.number = number;
     this.state = state;
     this.button = button;
     this.limit_switch = limit_switch;
+    this.transient_time = transient_time;
   }
 }
 
@@ -115,7 +114,7 @@ function MQTTconnect() {
   mqtt.connect(options); //connect
 }
 
-// Biar connect MQTT terus
+// MQTT Reconnect
 function onFailure(message) {
   console.log("Connection Attempt to Host " + host + "Failed");
   setTimeout(MQTTconnect, reconnectTimeout);
@@ -131,4 +130,65 @@ function onConnectionLost(responseObject) {
 
 MQTTconnect();
 
+// Game mechanism
+var lose=0;
 
+// Countdown
+function Countdown(Duration, func, Id){ 
+  var countDownDate = new Date().getTime()+(Duration*1000);
+  var x = setInterval(function(Duration, func, Id) {
+    // Get today's date and time
+    var now = new Date().getTime();
+
+    // Find the distance between now and the count down date
+    var distance = countDownDate - now;
+    
+    // Time calculations for days, hours, minutes and seconds
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Display the result in the element with id="demo"
+    document.getElementById(Id).innerHTML = seconds;
+
+    // If the count down is finished, write some text
+    if (distance < 0) {
+      clearInterval(x);
+      return func();
+    }
+  }, 1000)
+}
+
+function inc_grid_phase(){
+  grid_phase++;
+  if (grid_phase>4){
+    grid_phase=1;
+  }
+}
+
+function grid(){
+  Countdown(1, inc_grid_phase()); 
+}
+
+function startGrid(){
+  Countdown(round_time, grid(), "grid_phase");
+}
+
+function startGame(){
+  console.log("Goodluck and Have Fun!");
+  Countdown(5,"precount");
+  while ((round_number<=10)&&(!lose)){
+    round(round_number);
+    // ubah power
+    // ubah fail_chance
+    round_number++;
+    Countdown(7,"precount");
+  }
+}
+
+function round(round_number){
+  // mulai grid_phase interval 
+  // ubah demand
+  demand=
+  // cek perubahan state hingga timer selesai, selagi mengecek perubahan state, hitung skor
+  // tentukan apakah lanjut ke babak selanjutnya dengan variable lose
+  // matikan grid_phase interval
+}
