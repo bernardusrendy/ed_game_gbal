@@ -35,11 +35,13 @@ gen4 = new Generator(5,0.2,4,"offline",0,0,2);
 gen5 = new Generator(7,0.3,5,"offline",0,0,3);
 gen6 = new Generator(12,0.4,6,"offline",0,0,4);
 
-// Communication
-var mqtt;
-var reconnectTimeout = 2000;
-var host = "localhost";
-var port = 3000;
+// Server and broker address
+const brokerAddress = 'localhost'
+const serverAddress = 'localhost'
+const serverPort = 3000
+
+// MQTT Setup
+var client = mqtt.connect('ws:localhost:3000');
 
 function checkSupply(power,state){
   if (power&&(state=="lock")){
@@ -68,100 +70,67 @@ function convertState(int_state){
   }
 }
 
-function onMessageArrived(msg) {
-  // console.log(msg.destinationName);
-  switch (msg.destinationName){
-    case "1/button":
-        gen1.button=Number(msg.payloadString);
-        break;
-    case "1/limit_switch":
-        gen1.limit_switch=Number(msg.payloadString);
-        break;
-    case "2/button":
-        gen2.button=Number(msg.payloadString);
-        break;
-    case "2/limit_switch":
-        gen2.limit_switch=Number(msg.payloadString);
-        break;
-    case "3/button":
-        gen3.button=Number(msg.payloadString);
-        break;
-    case "3/limit_switch":
-        gen3.limit_switch=Number(msg.payloadString);
-        break;
-    case "4/button":
-        gen4.button=Number(msg.payloadString);
-        break;
-    case "4/limit_switch":
-        gen4.limit_switch=Number(msg.payloadString);
-        break;
-    case "5/button":
-        gen5.button=Number(msg.payloadString);
-        break;
-    case "5/limit_switch":
-        gen5.limit_switch=Number(msg.payloadString);
-        break;
-    case "6/button":
-        gen6.button=Number(msg.payloadString);
-        break;
-    case "6/limit_switch":
-        gen6.limit_switch=Number(msg.payloadString);
-        break;
-    default:
-  } 
-  supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)+checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
-  console.log(supply);
-}
+client.on('connect', function() {
+    console.log('client connected at %s:%s',brokerAddress);
+    client.subscribe('1/button');
+    client.subscribe('1/limit_switch');
+    client.subscribe('2/button');
+    client.subscribe('2/limit_switch');
+    client.subscribe('3/button');
+    client.subscribe('3/limit_switch')
+    client.subscribe('4/button');
+    client.subscribe('4/limit_switch');
+    client.subscribe('5/button');
+    client.subscribe('5/limit_switch');
+    client.subscribe('6/button');
+    client.subscribe('6/limit_switch');
+})
 
-function onConnect() {
-  // Once a connection has been made, make a subscription and send a message.
-  console.log("Connected ");
-  // Subscribe topic
-  /// Bwt Grafik dan Gauge
-  mqtt.subscribe("1/button");
-  mqtt.subscribe("1/limit_switch");
-  mqtt.subscribe("2/button");
-  mqtt.subscribe("2/limit_switch");
-  mqtt.subscribe("3/button");
-  mqtt.subscribe("3/limit_switch");
-  mqtt.subscribe("4/button");
-  mqtt.subscribe("4/limit_switch");
-  mqtt.subscribe("5/button");
-  mqtt.subscribe("5/limit_switch");
-  mqtt.subscribe("6/button");
-  mqtt.subscribe("6/limit_switch");
-}
-
-// Setup
-function MQTTconnect() {
-  console.log("connecting to " + host + " " + port);
-  mqtt = new Paho.MQTT.Client(host, port, "clientjs");
-  //document.write("connecting to "+ host);
-  var options = {
-    timeout: 3,
-    onSuccess: onConnect,
-    onFailure: onFailure
-  };
-  mqtt.onMessageArrived = onMessageArrived;
-  mqtt.connect(options); //connect
-}
-
-// MQTT Reconnect
-function onFailure(message) {
-  console.log("Connection Attempt to Host " + host + "Failed");
-  setTimeout(MQTTconnect, reconnectTimeout);
-}
-
-// called when the client loses its connection
-function onConnectionLost(responseObject) {
- console.log('oow');
-  if (responseObject.errorCode !== 0) {
-    console.log("onConnectionLost:" + responseObject.errorMessage);
-  }
-}
-
-MQTTconnect();
-
+// Message Receive
+client.on('message', function(topic, message) { 
+    //console.log('received message on %s: %s', topic, message)
+    switch (topic) {
+        case "1/button":
+            gen1.button=Number(message);
+            break;
+        case "1/limit_switch":
+            gen1.limit_switch=Number(message);
+            break;
+        case "2/button":
+            gen2.button=Number(msg.payloadString);
+            break;
+        case "2/limit_switch":
+            gen2.limit_switch=Number(msg.payloadString);
+            break;
+        case "3/button":
+            gen3.button=Number(msg.payloadString);
+            break;
+        case "3/limit_switch":
+            gen3.limit_switch=Number(msg.payloadString);
+            break;
+        case "4/button":
+            gen4.button=Number(msg.payloadString);
+            break;
+        case "4/limit_switch":
+            gen4.limit_switch=Number(msg.payloadString);
+            break;
+        case "5/button":
+            gen5.button=Number(msg.payloadString);
+            break;
+        case "5/limit_switch":
+            gen5.limit_switch=Number(msg.payloadString);
+            break;
+        case "6/button":
+            gen6.button=Number(msg.payloadString);
+            break;
+        case "6/limit_switch":
+            gen6.limit_switch=Number(msg.payloadString);
+            break;
+        default:
+    }
+    supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)+checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
+    console.log(supply);
+})
 // Game mechanism
 var lose=0;
 
