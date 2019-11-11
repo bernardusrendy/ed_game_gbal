@@ -219,7 +219,7 @@ function startGame(){
 function round(round_number){
   // mulai grid_phase interval 
   // ubah demand
-  demand=
+  // demand=
   // cek perubahan state hingga timer selesai, selagi mengecek perubahan state, hitung skor
   // tentukan apakah lanjut ke babak selanjutnya dengan variable lose
   // matikan grid_phase interval

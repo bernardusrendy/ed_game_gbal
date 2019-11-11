@@ -4,24 +4,24 @@
 #define BRIGHTNESS          96
 #define FRAMES_PER_SECOND  120
 
-#define pin_button1 53
-#define pin_limit_switch1 52
-#define pin_lights1 A0
-#define pin_button2 51
-#define pin_limit_switch2 50
-#define pin_lights2 A2
-#define pin_button3 49
-#define pin_limit_switch3 48
-#define pin_lights3 A3
-#define pin_button4 47
-#define pin_limit_switch4 46
-#define pin_lights4 A4
-#define pin_button5 45
-#define pin_limit_switch5 44
-#define pin_lights5 A5
-#define pin_button6 43
-#define pin_limit_switch6 42
-#define pin_lights6 A6
+#define pin_button1 A0
+#define pin_limit_switch1 A1
+#define pin_lights1 A2
+#define pin_button2 A3
+#define pin_limit_switch2 A4
+#define pin_lights2 A5
+#define pin_button3 A6
+#define pin_limit_switch3 A7
+#define pin_lights3 1
+#define pin_button4 2
+#define pin_limit_switch4 3
+#define pin_lights4 4
+#define pin_button5 5
+#define pin_limit_switch5 6
+#define pin_lights5 7
+#define pin_button6 8
+#define pin_limit_switch6 9
+#define pin_lights6 10
 
 #define DATA_MAX_SIZE 9
 
@@ -34,16 +34,18 @@ struct Generator {
   int pin_limit_switch;
   String state;
   int pin_lights;
+  int button_old;
+  int limit_switch_old;
   CRGB led_array[NUM_LEDS];
 };
 
 // Object Call
-Generator gen1 = {1,0,0,pin_button1,pin_limit_switch1,"offline",pin_lights1};
-Generator gen2 = {2,0,0,pin_button2,pin_limit_switch2,"offline",pin_lights2};
-Generator gen3 = {3,0,0,pin_button3,pin_limit_switch3,"offline",pin_lights3};
-Generator gen4 = {4,0,0,pin_button4,pin_limit_switch4,"offline",pin_lights4};
-Generator gen5 = {5,0,0,pin_button5,pin_limit_switch5,"offline",pin_lights5};
-Generator gen6 = {6,0,0,pin_button6,pin_limit_switch6,"offline",pin_lights6};
+Generator gen1 = {1,0,0,pin_button1,pin_limit_switch1,"offline",pin_lights1,1,1};
+Generator gen2 = {2,0,0,pin_button2,pin_limit_switch2,"offline",pin_lights2,1,1};
+Generator gen3 = {3,0,0,pin_button3,pin_limit_switch3,"offline",pin_lights3,1,1};
+Generator gen4 = {4,0,0,pin_button4,pin_limit_switch4,"offline",pin_lights4,1,1};
+Generator gen5 = {5,0,0,pin_button5,pin_limit_switch5,"offline",pin_lights5,1,1};
+Generator gen6 = {6,0,0,pin_button6,pin_limit_switch6,"offline",pin_lights6,1,1};
 
 // FastLED custom light
 uint8_t gHue = 0;
@@ -150,10 +152,9 @@ void routingSerialOut(String serialOut){
 
 void checkAttributeChange(Generator generator) { 
   // Change Check for Button
-  static boolean b_old = 1;
   boolean b = digitalRead(generator.pin_button);
-  boolean b_change = (b&&!b_old);
-  b_old = b;
+  boolean b_change = (b&&!generator.button_old);
+  generator.button_old = b;
   if(b_change){
     generator.button=!generator.button;
     Serial.print(generator.number);
@@ -161,10 +162,9 @@ void checkAttributeChange(Generator generator) {
     Serial.println(generator.button);
   }
   // Change Check for Limit Switch
-  static boolean ls_old = 1;
   boolean ls = digitalRead(generator.pin_limit_switch);
-  boolean ls_change = (ls&&!ls_old);
-  ls_old = ls;
+  boolean ls_change = (ls&&!generator.limit_switch_old);
+  generator.limit_switch_old = ls;
   if(ls_change){
     generator.limit_switch=!generator.limit_switch;
     Serial.print(generator.number);

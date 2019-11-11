@@ -25,13 +25,13 @@ client.on('connect', function() {
     client.subscribe('6/state');
 })
 
-// function SerialWrite(serialOut){ports.write(serialOut+'\n', (err) => {
-//     if (err) {
-//       return console.log('Error on write: ', err.message);
-//     }
-//     console.log('message written');
-//   });
-// }
+function SerialWrite(serialOut){ports.write(serialOut+'\n', (err) => {
+    if (err) {
+      return console.log('Error on write: ', err.message);
+    }
+    console.log('message written');
+  });
+}
 
 client.on('message', function(topic, message) { 
     //console.log('received message on %s: %s', topic, message)
@@ -46,7 +46,7 @@ ports.on("open", () => {
 parser.on('data', data =>{
   temp=data;
   topic=temp.split("/");
-	client.publish(topic[0]+"/"+topic[1],topic[2].toString(),{retain: true});
+	client.publish(topic[0]+"/"+topic[1],topic[2],{retain: true});
 	console.log('got word from arduino:', data);
 });
 
