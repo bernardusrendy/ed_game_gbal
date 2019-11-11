@@ -1,10 +1,3 @@
-// Protocol used for serialIn:
-// (button1,limit_switch1,button2,limit_switch2,
-//  button3,limit_switch3,button4,limit_switch4,
-//  button5,limit_switch5,button6,limit_switch6)
-// Protocol used for serialOut:
-// (state1,state2,state3,state4,state5,state6)
-
 // Game Variables
 var supply;
 var demand;
@@ -13,7 +6,7 @@ var grid_phase;
 
 // Class Declaration
 class Generator {
-  constructor(power,fail_chance,number,state,button,limit_switch,transient_time) {
+  constructor(power,fail_chance,number,state,button,limit_switch,transient_time,time_turned_on) {
     this.power = power;
     this.fail_chance = fail_chance;
     this.number = number;
@@ -21,6 +14,7 @@ class Generator {
     this.button = button;
     this.limit_switch = limit_switch;
     this.transient_time = transient_time;
+    this.time_turned_on = time_turned_on;
   }
 }
 
@@ -34,12 +28,12 @@ class Main_Control{
 }
 
 // Object Call
-gen1 = new Generator(1,0.1,1,"offline",0,0);
-gen2 = new Generator(3,0.2,2,"offline",0,0);
-gen3 = new Generator(4,0.2,3,"offline",0,0);
-gen4 = new Generator(5,0.2,4,"offline",0,0);
-gen5 = new Generator(7,0.3,5,"offline",0,0);
-gen6 = new Generator(12,0.4,6,"offline",0,0);
+gen1 = new Generator(1,0.1,1,"offline",0,0,1);
+gen2 = new Generator(3,0.2,2,"offline",0,0,1);
+gen3 = new Generator(4,0.2,3,"offline",0,0,2);
+gen4 = new Generator(5,0.2,4,"offline",0,0,2);
+gen5 = new Generator(7,0.3,5,"offline",0,0,3);
+gen6 = new Generator(12,0.4,6,"offline",0,0,4);
 
 // Communication
 var mqtt;
@@ -77,19 +71,46 @@ function convertState(int_state){
 function onMessageArrived(msg) {
   // console.log(msg.destinationName);
   switch (msg.destinationName){
-    case "serialIn":
-      var sdata = msg.payloadString.split(",").map(Number);
-      gen1.button=sdata[0];gen1.limit_switch=sdata[1];
-      gen2.button=sdata[2];gen2.limit_switch=sdata[3];
-      gen3.button=sdata[4];gen3.limit_switch=sdata[5];
-      gen4.button=sdata[6];gen4.limit_switch=sdata[7];
-      gen5.button=sdata[8];gen5.limit_switch=sdata[9];
-      gen6.button=sdata[10];gen6.limit_switch=sdata[11];
-      supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)
-              +checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
-      console.log(supply);
-      break;
+    case "1/button":
+        gen1.button=Number(msg.payloadString);
+        break;
+    case "1/limit_switch":
+        gen1.limit_switch=Number(msg.payloadString);
+        break;
+    case "2/button":
+        gen2.button=Number(msg.payloadString);
+        break;
+    case "2/limit_switch":
+        gen2.limit_switch=Number(msg.payloadString);
+        break;
+    case "3/button":
+        gen3.button=Number(msg.payloadString);
+        break;
+    case "3/limit_switch":
+        gen3.limit_switch=Number(msg.payloadString);
+        break;
+    case "4/button":
+        gen4.button=Number(msg.payloadString);
+        break;
+    case "4/limit_switch":
+        gen4.limit_switch=Number(msg.payloadString);
+        break;
+    case "5/button":
+        gen5.button=Number(msg.payloadString);
+        break;
+    case "5/limit_switch":
+        gen5.limit_switch=Number(msg.payloadString);
+        break;
+    case "6/button":
+        gen6.button=Number(msg.payloadString);
+        break;
+    case "6/limit_switch":
+        gen6.limit_switch=Number(msg.payloadString);
+        break;
+    default:
   } 
+  supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)+checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
+  console.log(supply);
 }
 
 function onConnect() {
@@ -97,7 +118,18 @@ function onConnect() {
   console.log("Connected ");
   // Subscribe topic
   /// Bwt Grafik dan Gauge
-  mqtt.subscribe("serialIn");
+  mqtt.subscribe("1/button");
+  mqtt.subscribe("1/limit_switch");
+  mqtt.subscribe("2/button");
+  mqtt.subscribe("2/limit_switch");
+  mqtt.subscribe("3/button");
+  mqtt.subscribe("3/limit_switch");
+  mqtt.subscribe("4/button");
+  mqtt.subscribe("4/limit_switch");
+  mqtt.subscribe("5/button");
+  mqtt.subscribe("5/limit_switch");
+  mqtt.subscribe("6/button");
+  mqtt.subscribe("6/limit_switch");
 }
 
 // Setup

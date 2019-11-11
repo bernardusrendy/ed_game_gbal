@@ -22,9 +22,12 @@ Therefore there will be:
 			7. pin_limit_switch: *IN ARDUINO*
 			8. pin_button: *IN ARDUINO*
 			9. transient_time: 
+			10. pin_lights: *IN ARDUINO*
+			11. time_turned_on:
 		-behavior:
 			1. lights(state)
 			2. changeState(state)
+			3. digitalIn(pin_limit_switch,pin_button)
 2. 1 main_control with 4 attributes:
 		-attributes: 
 			1. score: (if abs(supply-demand)<=3, score=+10, else score=+10-abs(supply-demand))
@@ -52,15 +55,10 @@ HTML_CSS_JS (Laptop Tersambung Monitor dan mainboard):
 	1. Tampilan
 	2. Olahdata main_control
 
-Protocol used for serialIn:
-	(button1,limit_switch1,button2,limit_switch2,
-	 button3,limit_switch3,button4,limit_switch4,
-	 button5,limit_switch5,button6,limit_switch6)
-Protocol used for serialOut:
-	(state1,state2,state3,state4,state5,state6)
+Protocol are adjusted for MQTT with structure:
+	generator.number/attributes/value
 
 Untested and Incomplete:
 	1. SerialOut from Client to Serial Port to arduino
-	2. Conditional serial print from arduino to serial Port
-	3. Conditional Game mechanism Code with display to client
-	4. 
+	2. StateChange Game mechanism with display
+	3. 
