@@ -69,7 +69,7 @@ client.on('connect', function() {
 })
 
 // Message Receive
-client.on('message', function(topic, message) { 
+client.on('message', function(topic, message) {
     //console.log('received message on %s: %s', topic, message)
     switch (topic) {
         case "1/button":
@@ -168,27 +168,17 @@ function changeSupply(number){
 // var lose=0;
 
 // Countdown
-function Countdown(Duration, func, Id){ 
-  var countDownDate = new Date().getTime()+(Duration*1000);
-  var x = setInterval(function(Duration, func, Id) {
-    // Get today's date and time
-    var now = new Date().getTime();
+function Countdown(Duration, func, id){
+  var startTime = Date.now();
+  var interval = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = Duration - elapsedTime;
+      document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
 
-    // Find the distance between now and the count down date
-    var distance = countDownDate - now;
-    
-    // Time calculations for days, hours, minutes and seconds
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    // Display the result in the element with id="demo"
-    document.getElementById(Id).innerHTML = seconds;
-
-    // If the count down is finished, write some text
-    if (distance < 0) {
-      clearInterval(x);
-      return func();
-    }
-  }, 1000)
+      if (distance < 0) {
+        clearInterval(x);
+        return func();
+  }, 10);
 }
 
 function Countdown(Duration, func, id){
@@ -204,6 +194,7 @@ function Countdown(Duration, func, id){
   }, 10);
 }
 
+<<<<<<< HEAD
 // function inc_grid_phase(){
 //   grid_phase++;
 //   if (grid_phase>4){
@@ -239,3 +230,33 @@ function Countdown(Duration, func, id){
 //   // tentukan apakah lanjut ke babak selanjutnya dengan variable lose
 //   // matikan grid_phase interval
 // }
+=======
+function grid(){
+  Countdown(1, inc_grid_phase());
+}
+
+function startGrid(){
+  Countdown(round_time, grid(), "grid_phase");
+}
+
+function startGame(){
+  console.log("Goodluck and Have Fun!");
+  Countdown(5,"precount");
+  while ((round_number<=10)&&(!lose)){
+    round(round_number);
+    // ubah power
+    // ubah fail_chance
+    round_number++;
+    Countdown(7,"precount");
+  }
+}
+
+function round(round_number){
+  // mulai grid_phase interval
+  // ubah demand
+  // demand=
+  // cek perubahan state hingga timer selesai, selagi mengecek perubahan state, hitung skor
+  // tentukan apakah lanjut ke babak selanjutnya dengan variable lose
+  // matikan grid_phase interval
+}
+>>>>>>> fff2a7d5fad829ed8cfbf08c4b394736ae9e2573
