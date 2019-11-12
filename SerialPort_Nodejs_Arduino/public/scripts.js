@@ -1,8 +1,10 @@
 // Game Variables
-var supply;
-var demand;
-var score;
-var grid_phase;
+var id;
+var supply=0;
+var demand=0;
+var score=0;
+var grid_phase=0;
+var duration=10000;
 
 // Class Declaration
 class Generator {
@@ -119,37 +121,40 @@ function serialOut(message){
   client.publish(message);
 }
 
-var id;
-var temp;
-
 function changeState(generator,state){
   id="state_"+generator.number.toString();
-  if(generator.state="offline"&&state="transient"){
-    id.removeClass("bg-secondary").addClass("bg-info");
+  if(generator.state=="offline"&&state=="transient"){
+    id.removeClass("bg-secondary").addClass("bg-warning");
   }
-  else if(generator.state="offline"&&state="steady"){
+  else if(generator.state=="offline"&&state=="steady"){
     id.removeClass("bg-secondary").addClass("bg-primary");
   }
-  else if(generator.state="transient"&&state="steady"){
-    id.removeClass("bg-info").addClass("bg-primary");
+  else if(generator.state=="transient"&&state=="steady"){
+    id.removeClass("bg-warning").addClass("bg-primary");
   }
-  else if(generator.state="transient"&&state="fail"){
-    id.removeClass("bg-info").addClass("bg-warning");
+  else if(generator.state=="transient"&&state=="fail"){
+    id.removeClass("bg-warning").addClass("bg-danger");
   }
-  else if(generator.state="steady"&&state="fail"){
-    id.removeClass("bg-primary").addClass("bg-warning");
-  }
-  else if(generator.state="fail"&&state="offline"){
+  else if(generator.state=="transient"&&state=="offline"){
     id.removeClass("bg-warning").addClass("bg-secondary");
   }
-  else if(generator.state="steady"&&state="lock"){
+  else if(generator.state=="steady"&&state=="fail"){
+    id.removeClass("bg-primary").addClass("bg-danger");
+  }
+  else if(generator.state=="steady"&&state=="offline"){
+    id.removeClass("bg-primary").addClass("bg-secondary");
+  }
+  else if(generator.state=="fail"&&state=="offline"){
+    id.removeClass("bg-danger").addClass("bg-secondary");
+  }
+  else if(generator.state=="steady"&&state=="lock"){
     id.removeClass("bg-primary").addClass("bg-success");
   }
-  else if(generator.state="lock"&&state="offline"){
+  else if(generator.state=="lock"&&state=="offline"){
     id.removeClass("bg-success").addClass("bg-secondary");
   }
   generator.state=state;
-  serialOut(generator.number.toString+"/state"+generator.state);
+  serialOut(generator.number.toString+"/state/"+generator.state);
 }
 
 function changeDemand(number){
@@ -164,99 +169,67 @@ function changeSupply(number){
   document.getElementById("supply_bar").style.width = (number*4/25).toString+"%";
 }
 
-// // Game mechanism
-// var lose=0;
-
-// Countdown
-function Countdown(Duration, func, id){
-  var startTime = Date.now();
-  var interval = setInterval(function() {
-      var elapsedTime = Date.now() - startTime;
-      var distance = Duration - elapsedTime;
-      document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
-
-      if (distance < 0) {
-        clearInterval(x);
-        return func();
-  }, 10);
-}
-
-function Countdown(Duration, func, id){
-  var startTime = Date.now();
-  var interval = setInterval(function() {
-      var elapsedTime = Date.now() - startTime;
-      var distance = Duration - elapsedTime;
-      document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
-
-      if (distance < 0) {
-        clearInterval(x);
-        return func();
-  }, 10);
-}
-
-<<<<<<< HEAD
-// function inc_grid_phase(){
-//   grid_phase++;
-//   if (grid_phase>4){
-//     grid_phase=1;
-//   }
-// }
-
-// function grid(){
-//   Countdown(1, inc_grid_phase()); 
-// }
-
-// function startGrid(){
-//   Countdown(round_time, grid(), "grid_phase");
-// }
-
-// function startGame(){
-//   console.log("Goodluck and Have Fun!");
-//   Countdown(5,"precount");
-//   while ((round_number<=10)&&(!lose)){
-//     round(round_number);
-//     // ubah power
-//     // ubah fail_chance
-//     round_number++;
-//     Countdown(7,"precount");
-//   }
-// }
-
-// function round(round_number){
-//   // mulai grid_phase interval 
-//   // ubah demand
-//   // demand=
-//   // cek perubahan state hingga timer selesai, selagi mengecek perubahan state, hitung skor
-//   // tentukan apakah lanjut ke babak selanjutnya dengan variable lose
-//   // matikan grid_phase interval
-// }
-=======
-function grid(){
-  Countdown(1, inc_grid_phase());
-}
-
-function startGrid(){
-  Countdown(round_time, grid(), "grid_phase");
-}
-
-function startGame(){
-  console.log("Goodluck and Have Fun!");
-  Countdown(5,"precount");
-  while ((round_number<=10)&&(!lose)){
-    round(round_number);
-    // ubah power
-    // ubah fail_chance
-    round_number++;
-    Countdown(7,"precount");
+function inc_grid_phase(){
+  grid_phase++;
+  if (grid_phase>4){
+    grid_phase=1;
+  }
+  if(grid_phase==1){
+    $("#gp-1").removeClass("bg-success").addClass("bg-warning");
+    $("#gp-2").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-3").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-4").removeClass("bg-warning").addClass("bg-success");
+  }
+  else if(grid_phase==2){
+    $("#gp-2").removeClass("bg-success").addClass("bg-warning");
+    $("#gp-1").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-3").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-4").removeClass("bg-warning").addClass("bg-success");
+  }
+  else if(grid_phase==3){
+    $("#gp-3").removeClass("bg-success").addClass("bg-warning");
+    $("#gp-2").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-1").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-4").removeClass("bg-warning").addClass("bg-success");
+  }
+  else if(grid_phase==4){
+    $("#gp-4").removeClass("bg-success").addClass("bg-warning");
+    $("#gp-2").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-3").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-1").removeClass("bg-warning").addClass("bg-success");
   }
 }
 
-function round(round_number){
-  // mulai grid_phase interval
-  // ubah demand
-  // demand=
-  // cek perubahan state hingga timer selesai, selagi mengecek perubahan state, hitung skor
-  // tentukan apakah lanjut ke babak selanjutnya dengan variable lose
-  // matikan grid_phase interval
+function gridPhase(){
+  var startTime = Date.now();
+  var interval = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = 1000 - elapsedTime;
+      if (distance <= 0) {
+        startTime=Date.now();
+        return inc_grid_phase();
+      }
+  },10);
 }
->>>>>>> fff2a7d5fad829ed8cfbf08c4b394736ae9e2573
+//Countdown and game
+function gameOver(){
+
+}
+// Timer countDown
+function countDown(Duration, func, id){
+  var startTime = Date.now();
+  var interval = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = Duration - elapsedTime;
+      document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
+      if (distance <= 10) {
+        clearInterval(interval);
+        return func();
+      }
+  },10);
+}
+
+// MAIN
+var duration=9000;
+countDown(duration,gameOver,"time");
+gridPhase();
