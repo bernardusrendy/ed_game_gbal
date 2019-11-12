@@ -4,6 +4,9 @@ var demand;
 var score;
 var grid_phase;
 
+
+var mqtt = require('mqtt')
+
 // Class Declaration
 class Generator {
   constructor(power,fail_chance,number,state,button,limit_switch,transient_time,time_turned_on) {
@@ -97,34 +100,34 @@ client.on('message', function(topic, message) {
             gen1.limit_switch=Number(message);
             break;
         case "2/button":
-            gen2.button=Number(msg.payloadString);
+            gen2.button=Number(message);
             break;
         case "2/limit_switch":
-            gen2.limit_switch=Number(msg.payloadString);
+            gen2.limit_switch=Number(message);
             break;
         case "3/button":
-            gen3.button=Number(msg.payloadString);
+            gen3.button=Number(message);
             break;
         case "3/limit_switch":
-            gen3.limit_switch=Number(msg.payloadString);
+            gen3.limit_switch=Number(message);
             break;
         case "4/button":
-            gen4.button=Number(msg.payloadString);
+            gen4.button=Number(message);
             break;
         case "4/limit_switch":
-            gen4.limit_switch=Number(msg.payloadString);
+            gen4.limit_switch=Number(message);
             break;
         case "5/button":
-            gen5.button=Number(msg.payloadString);
+            gen5.button=Number(message);
             break;
         case "5/limit_switch":
-            gen5.limit_switch=Number(msg.payloadString);
+            gen5.limit_switch=Number(message);
             break;
         case "6/button":
-            gen6.button=Number(msg.payloadString);
+            gen6.button=Number(message);
             break;
         case "6/limit_switch":
-            gen6.limit_switch=Number(msg.payloadString);
+            gen6.limit_switch=Number(message);
             break;
         default:
     }
