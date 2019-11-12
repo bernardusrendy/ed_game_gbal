@@ -1,3 +1,6 @@
+# ED_GAME_GBAL
+Educational game that simulates a centralized energy generation with its problem, mainly focuses in balancing demand and energy supplied
+## About
 The idea of generator balancing is a game to educate young teen to young adult about the process in large scale centralized
 energy generation. The challenge is to balance the (supply) of the energy generation regarding the (demand).
 the (offline) generator will need time to be turned on (transient time) to (steady state) and inserted to the grid (lock) with
@@ -5,11 +8,13 @@ correct phase.
 sometimes it also fails (fail) and need to be restarted to transient time and to steady state once again.
 The game will be divided into (10 rounds), with each demand gets higher and trickier number
 
+## User Interface
 User will interface input from (6 generators) each has (1 button) and (1 limit switch)
 User will interface output from (1 monitor screen) for {(score), (demand), (supply), (grid_phase)} and , 
 (6 LED strip in each generator) for indicating generator state, 
 and (Light in Button in each generator)
 
+## Classes and Objects
 Therefore there will be:
 1. 6 generators with 8 attributes, 2 behavior: 
 		-attributes: 
@@ -40,18 +45,19 @@ Therefore there will be:
 			1. next_round()
 			2. start_game()
 
-Code development will be in python with serial communication to arduino nano in mainboard, taking input from generators and controlling actuators in generators
+## Code Development
+Code development is being done in javascript with serial communication to arduino nano in mainboard, taking input from generators and controlling actuators in generators.
 
-CPP (arduino Nano):
-	1. akuisisi data:
+CPP (arduino Mega):
+	1. data acquisition:
 		-button
 		-limit_switch
 	2. aktuator:
 		-lights(state)
-	3. Terima Serial dari Laptop untuk state
-	4. Kirim Serial ke Laptop hasil bacaan button dan limit switch
+	3. SerialOut from laptop to update "state" in generators
+	4. SerialIn to laptop to update "button" and "limit_switch" of generators object in javascript
 
-HTML_CSS_JS (Laptop Tersambung Monitor dan mainboard):
+HTML_CSS_JS (Laptop with external monitor):
 	1. Tampilan
 	2. Olahdata main_control
 
@@ -61,4 +67,3 @@ Protocol are adjusted for MQTT with structure:
 Untested and Incomplete:
 	1. SerialOut from Client to Serial Port to arduino
 	2. StateChange Game mechanism with display
-	3. 
