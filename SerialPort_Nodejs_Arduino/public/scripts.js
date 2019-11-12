@@ -4,9 +4,6 @@ var demand;
 var score;
 var grid_phase;
 
-
-var mqtt = require('mqtt')
-
 // Class Declaration
 class Generator {
   constructor(power,fail_chance,number,state,button,limit_switch,transient_time,time_turned_on) {
@@ -52,24 +49,6 @@ function checkSupply(power,state){
   }
   else {
     return 0;
-  }
-}
-
-function convertState(int_state){
-  if (int_state==0){
-    return "offline"
-  }
-  if (int_state==1){
-    return "transient"
-  }
-  if (int_state==2){
-    return "steady"
-  }
-  if (int_state==3){
-    return "lock"
-  }
-  if (int_state==4){
-    return "fail"
   }
 }
 
@@ -134,8 +113,59 @@ client.on('message', function(topic, message) {
     supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)+checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
     console.log(supply);
 })
-// Game mechanism
-var lose=0;
+
+// Message send
+function serialOut(message){
+  client.publish(message);
+}
+
+var id;
+var temp;
+
+function changeState(generator,state){
+  id="state_"+generator.number.toString();
+  if(generator.state="offline"&&state="transient"){
+    id.removeClass("bg-secondary").addClass("bg-info");
+  }
+  else if(generator.state="offline"&&state="steady"){
+    id.removeClass("bg-secondary").addClass("bg-primary");
+  }
+  else if(generator.state="transient"&&state="steady"){
+    id.removeClass("bg-info").addClass("bg-primary");
+  }
+  else if(generator.state="transient"&&state="fail"){
+    id.removeClass("bg-info").addClass("bg-warning");
+  }
+  else if(generator.state="steady"&&state="fail"){
+    id.removeClass("bg-primary").addClass("bg-warning");
+  }
+  else if(generator.state="fail"&&state="offline"){
+    id.removeClass("bg-warning").addClass("bg-secondary");
+  }
+  else if(generator.state="steady"&&state="lock"){
+    id.removeClass("bg-primary").addClass("bg-success");
+  }
+  else if(generator.state="lock"&&state="offline"){
+    id.removeClass("bg-success").addClass("bg-secondary");
+  }
+  generator.state=state;
+  serialOut(generator.number.toString+"/state"+generator.state);
+}
+
+function changeDemand(number){
+  demand=number;
+  document.getElementById("demand").innerHTML = number;
+  document.getElementById("demand_bar").style.width = (number*4/25).toString+"%";
+}
+
+function changeSupply(number){
+  supply=number;
+  document.getElementById("supply").innerHTML = number;
+  document.getElementById("supply_bar").style.width = (number*4/25).toString+"%";
+}
+
+// // Game mechanism
+// var lose=0;
 
 // Countdown
 function Countdown(Duration, func, Id){ 
@@ -161,38 +191,51 @@ function Countdown(Duration, func, Id){
   }, 1000)
 }
 
-function inc_grid_phase(){
-  grid_phase++;
-  if (grid_phase>4){
-    grid_phase=1;
-  }
+function Countdown(Duration, func, id){
+  var startTime = Date.now();
+  var interval = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = Duration - elapsedTime;
+      document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
+
+      if (distance < 0) {
+        clearInterval(x);
+        return func();
+  }, 10);
 }
 
-function grid(){
-  Countdown(1, inc_grid_phase()); 
-}
+// function inc_grid_phase(){
+//   grid_phase++;
+//   if (grid_phase>4){
+//     grid_phase=1;
+//   }
+// }
 
-function startGrid(){
-  Countdown(round_time, grid(), "grid_phase");
-}
+// function grid(){
+//   Countdown(1, inc_grid_phase()); 
+// }
 
-function startGame(){
-  console.log("Goodluck and Have Fun!");
-  Countdown(5,"precount");
-  while ((round_number<=10)&&(!lose)){
-    round(round_number);
-    // ubah power
-    // ubah fail_chance
-    round_number++;
-    Countdown(7,"precount");
-  }
-}
+// function startGrid(){
+//   Countdown(round_time, grid(), "grid_phase");
+// }
 
-function round(round_number){
-  // mulai grid_phase interval 
-  // ubah demand
-  // demand=
-  // cek perubahan state hingga timer selesai, selagi mengecek perubahan state, hitung skor
-  // tentukan apakah lanjut ke babak selanjutnya dengan variable lose
-  // matikan grid_phase interval
-}
+// function startGame(){
+//   console.log("Goodluck and Have Fun!");
+//   Countdown(5,"precount");
+//   while ((round_number<=10)&&(!lose)){
+//     round(round_number);
+//     // ubah power
+//     // ubah fail_chance
+//     round_number++;
+//     Countdown(7,"precount");
+//   }
+// }
+
+// function round(round_number){
+//   // mulai grid_phase interval 
+//   // ubah demand
+//   // demand=
+//   // cek perubahan state hingga timer selesai, selagi mengecek perubahan state, hitung skor
+//   // tentukan apakah lanjut ke babak selanjutnya dengan variable lose
+//   // matikan grid_phase interval
+// }

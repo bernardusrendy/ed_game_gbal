@@ -151,6 +151,7 @@ void receiveData() {
 //  Serial.println(data);
   serialOut = data;
   memset(data, 32, sizeof(data));
+  Serial.println(serialOut);
 }
 
 // Routing Serial Out Conditional
