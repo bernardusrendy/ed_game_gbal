@@ -87,7 +87,7 @@ client.on('connect', function() {
 })
 
 // Message Receive
-client.on('message', function(topic, message) { 
+client.on('message', function(topic, message) {
     //console.log('received message on %s: %s', topic, message)
     switch (topic) {
         case "1/button":
@@ -135,27 +135,17 @@ client.on('message', function(topic, message) {
 var lose=0;
 
 // Countdown
-function Countdown(Duration, func, Id){ 
-  var countDownDate = new Date().getTime()+(Duration*1000);
-  var x = setInterval(function(Duration, func, Id) {
-    // Get today's date and time
-    var now = new Date().getTime();
+function Countdown(Duration, func, id){
+  var startTime = Date.now();
+  var interval = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = Duration - elapsedTime;
+      document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
 
-    // Find the distance between now and the count down date
-    var distance = countDownDate - now;
-    
-    // Time calculations for days, hours, minutes and seconds
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    // Display the result in the element with id="demo"
-    document.getElementById(Id).innerHTML = seconds;
-
-    // If the count down is finished, write some text
-    if (distance < 0) {
-      clearInterval(x);
-      return func();
-    }
-  }, 1000)
+      if (distance < 0) {
+        clearInterval(x);
+        return func();
+  }, 10);
 }
 
 function inc_grid_phase(){
@@ -166,7 +156,7 @@ function inc_grid_phase(){
 }
 
 function grid(){
-  Countdown(1, inc_grid_phase()); 
+  Countdown(1, inc_grid_phase());
 }
 
 function startGrid(){
@@ -186,7 +176,7 @@ function startGame(){
 }
 
 function round(round_number){
-  // mulai grid_phase interval 
+  // mulai grid_phase interval
   // ubah demand
   // demand=
   // cek perubahan state hingga timer selesai, selagi mengecek perubahan state, hitung skor
