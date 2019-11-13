@@ -127,7 +127,7 @@ function changePower(generator,power){
 }
 
 function changeState(generator,state){
-  id="state_"+generator.number.toString();
+  id="#state_"+generator.number.toString();
   if(generator.state=="offline"&&state=="transient"){
     $(id).removeClass("bg-secondary").addClass("bg-warning");
   }
@@ -164,14 +164,14 @@ function changeState(generator,state){
 
 function changeDemand(number){
   demand=number;
-  document.getElementById("demand").innerHTML = number.toString();
-  document.getElementById("demand_bar").style.width = (number*4/25).toString+"%";
+  document.getElementById("demand").innerHTML = number.toFixed(2).toString();
+  document.getElementById("demand_bar").style.width = (number*4).toString()+"%";
 }
 
 function changeSupply(number){
   supply=number;
-  document.getElementById("supply").innerHTML = number.toString();
-  document.getElementById("supply_bar").style.width = (number*4/25).toString+"%";
+  document.getElementById("supply").innerHTML = number.toFixed(2).toString();
+  document.getElementById("supply_bar").style.width = (number*4).toString()+"%";
 }
 
 function inc_grid_phase(){
@@ -210,7 +210,7 @@ function gridPhase(){
   var interval = setInterval(function() {
       var elapsedTime = Date.now() - startTime;
       var distance = 1000 - elapsedTime;
-      if (distance <= 0) {
+      if (distance <= 6) {
         startTime=Date.now();
         return inc_grid_phase();
       }
@@ -227,7 +227,7 @@ function countDown(Duration, func, id){
       var elapsedTime = Date.now() - startTime;
       var distance = Duration - elapsedTime;
       document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
-      if (distance <= 10) {
+      if (distance <= 6) {
         clearInterval(interval);
         return func();
       }
@@ -238,13 +238,40 @@ function countDown(Duration, func, id){
 var duration=9000;
 countDown(duration,gameOver,"time");
 gridPhase();
-var startTime = Date.now();
+var startTime1 = Date.now();
 var interval = setInterval(function() {
-      var elapsedTime = Date.now() - startTime;
+      var elapsedTime = Date.now() - startTime1;
       var distance = 5000 - elapsedTime;
-      document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
-      if (distance <= 10) {
-        startTime=Date.now();
-        return changeDemand(Math.random*100);
+      if (distance <= 6) {
+        startTime1=Date.now();
+        return changeDemand(Math.random()*25);
       }
   },10)
+var startTime2= Date.now();
+var interval2 = setInterval(function() {
+      var elapsedTime = Date.now() - startTime2;
+      var distance = 5000 - elapsedTime;
+      if (distance <= 6) {
+        startTime2=Date.now();
+        return changeSupply(Math.random()*25);
+      }
+  },10)
+var startTime3= Date.now();
+var interval3 = setInterval(function() {
+      var elapsedTime = Date.now() - startTime3;
+      var distance = 5000 - elapsedTime;
+      if (distance <= 6) {
+        startTime3=Date.now();
+        return changeState(gen1, "transient");
+      }
+  },10)
+var startTime4= Date.now();
+var interval4 = setInterval(function() {
+      var elapsedTime = Date.now() - startTime4;
+      var distance = 10000 - elapsedTime;
+      if (distance <= 6) {
+        startTime4=Date.now();
+        return changeState(gen1, "offline");
+      }
+  },10)
+ 
