@@ -121,37 +121,42 @@ function serialOut(message){
   client.publish(message);
 }
 
+function changePower(generator,power){
+  id="power_"+generator.number.toString();
+  document.getElementById(id).innerHTML = power.toString();
+}
+
 function changeState(generator,state){
   id="state_"+generator.number.toString();
   if(generator.state=="offline"&&state=="transient"){
-    id.removeClass("bg-secondary").addClass("bg-warning");
+    $(id).removeClass("bg-secondary").addClass("bg-warning");
   }
   else if(generator.state=="offline"&&state=="steady"){
-    id.removeClass("bg-secondary").addClass("bg-primary");
+    $(id).removeClass("bg-secondary").addClass("bg-primary");
   }
   else if(generator.state=="transient"&&state=="steady"){
-    id.removeClass("bg-warning").addClass("bg-primary");
+    $(id).removeClass("bg-warning").addClass("bg-primary");
   }
   else if(generator.state=="transient"&&state=="fail"){
-    id.removeClass("bg-warning").addClass("bg-danger");
+    $(id).removeClass("bg-warning").addClass("bg-danger");
   }
   else if(generator.state=="transient"&&state=="offline"){
-    id.removeClass("bg-warning").addClass("bg-secondary");
+    $(id).removeClass("bg-warning").addClass("bg-secondary");
   }
   else if(generator.state=="steady"&&state=="fail"){
-    id.removeClass("bg-primary").addClass("bg-danger");
+    $(id).removeClass("bg-primary").addClass("bg-danger");
   }
   else if(generator.state=="steady"&&state=="offline"){
-    id.removeClass("bg-primary").addClass("bg-secondary");
+    $(id).removeClass("bg-primary").addClass("bg-secondary");
   }
   else if(generator.state=="fail"&&state=="offline"){
-    id.removeClass("bg-danger").addClass("bg-secondary");
+    $(id).removeClass("bg-danger").addClass("bg-secondary");
   }
   else if(generator.state=="steady"&&state=="lock"){
-    id.removeClass("bg-primary").addClass("bg-success");
+    $(id).removeClass("bg-primary").addClass("bg-success");
   }
   else if(generator.state=="lock"&&state=="offline"){
-    id.removeClass("bg-success").addClass("bg-secondary");
+    $(id).removeClass("bg-success").addClass("bg-secondary");
   }
   generator.state=state;
   serialOut(generator.number.toString+"/state/"+generator.state);
@@ -159,13 +164,13 @@ function changeState(generator,state){
 
 function changeDemand(number){
   demand=number;
-  document.getElementById("demand").innerHTML = number;
+  document.getElementById("demand").innerHTML = number.toString();
   document.getElementById("demand_bar").style.width = (number*4/25).toString+"%";
 }
 
 function changeSupply(number){
   supply=number;
-  document.getElementById("supply").innerHTML = number;
+  document.getElementById("supply").innerHTML = number.toString();
   document.getElementById("supply_bar").style.width = (number*4/25).toString+"%";
 }
 
@@ -233,3 +238,13 @@ function countDown(Duration, func, id){
 var duration=9000;
 countDown(duration,gameOver,"time");
 gridPhase();
+var startTime = Date.now();
+var interval = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = 5000 - elapsedTime;
+      document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
+      if (distance <= 10) {
+        startTime=Date.now();
+        return changeDemand(Math.random*100);
+      }
+  },10)
