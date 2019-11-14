@@ -44,9 +44,9 @@ struct Generator {
   void checkAttributeChange() { 
   // Change Check for Button
     boolean b = digitalRead(pin_button);
-    boolean b_change = (b&&!button_old);
+    boolean b_change_nxor = !(!(b&&!button_old)&&(b||!button_old));
     button_old = b;
-    if(b_change){
+    if(b_change_nxor){
       button=!button;
       Serial.print(number);
       Serial.print("/button/");
@@ -151,7 +151,7 @@ void receiveData() {
 //  Serial.println(data);
   serialOut = data;
   memset(data, 32, sizeof(data));
-  Serial.println(serialOut);
+//  Serial.println(serialOut);
 }
 
 // Routing Serial Out Conditional

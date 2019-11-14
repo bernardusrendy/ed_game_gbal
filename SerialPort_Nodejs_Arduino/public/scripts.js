@@ -33,7 +33,7 @@ class Main_Control{
 gen1 = new Generator(1,0.1,1,"offline",0,0,1);
 gen2 = new Generator(3,0.2,2,"offline",0,0,1);
 gen3 = new Generator(4,0.2,3,"offline",0,0,2);
-gen4 = new Generator(5,0.2,4,"offline",0,0,2);
+gen4 = new Generator(5,0.2,4,"offline",0,0,5000);
 gen5 = new Generator(7,0.3,5,"offline",0,0,3);
 gen6 = new Generator(12,0.4,6,"offline",0,0,4);
 
@@ -110,10 +110,8 @@ client.on('message', function(topic, message) {
         case "6/limit_switch":
             gen6.limit_switch=Number(message);
             break;
-        default:
     }
-    supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)+checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
-    console.log(supply);
+    // console.log(supply);
 })
 
 // Message send
@@ -128,38 +126,39 @@ function changePower(generator,power){
 
 function changeState(generator,state){
   id="#state_"+generator.number.toString();
-  if(generator.state=="offline"&&state=="transient"){
-    $(id).removeClass("bg-secondary").addClass("bg-warning");
+  if(generator.state=="offline"){
+    $(id).removeClass("bg-secondary");
   }
-  else if(generator.state=="offline"&&state=="steady"){
-    $(id).removeClass("bg-secondary").addClass("bg-primary");
+  else if(generator.state=="transient"){
+    $(id).removeClass("bg-warning");
   }
-  else if(generator.state=="transient"&&state=="steady"){
-    $(id).removeClass("bg-warning").addClass("bg-primary");
+  else if(generator.state=="steady"){
+    $(id).removeClass("bg-primary");
   }
-  else if(generator.state=="transient"&&state=="fail"){
-    $(id).removeClass("bg-warning").addClass("bg-danger");
+  else if(generator.state=="lock"){
+    $(id).removeClass("bg-success");
   }
-  else if(generator.state=="transient"&&state=="offline"){
-    $(id).removeClass("bg-warning").addClass("bg-secondary");
+  else if(generator.state=="fail"){
+    $(id).removeClass("bg-danger");
   }
-  else if(generator.state=="steady"&&state=="fail"){
-    $(id).removeClass("bg-primary").addClass("bg-danger");
+  if(state=="offline"){
+    $(id).addClass("bg-secondary");
   }
-  else if(generator.state=="steady"&&state=="offline"){
-    $(id).removeClass("bg-primary").addClass("bg-secondary");
+  else if(state=="transient"){
+    $(id).addClass("bg-warning");
   }
-  else if(generator.state=="fail"&&state=="offline"){
-    $(id).removeClass("bg-danger").addClass("bg-secondary");
+  else if(state=="steady"){
+    $(id).addClass("bg-primary");
   }
-  else if(generator.state=="steady"&&state=="lock"){
-    $(id).removeClass("bg-primary").addClass("bg-success");
+  else if(state=="lock"){
+    $(id).addClass("bg-success");
   }
-  else if(generator.state=="lock"&&state=="offline"){
-    $(id).removeClass("bg-success").addClass("bg-secondary");
+  else if(state=="fail"){
+    $(id).addClass("bg-danger");
   }
   generator.state=state;
   serialOut(generator.number.toString+"/state/"+generator.state);
+  console.log("perubahan warna");
 }
 
 function changeDemand(number){
@@ -205,6 +204,56 @@ function inc_grid_phase(){
   }
 }
 
+function generatorState(generator){
+  switch(generator.state){
+    case "offline":
+      if(generator.limit_switch&&generator.button){
+        changeState(generator,"transient");
+        var timeout=setTimeout(function(){changeState(generator,"steady");clearTimeout(timeout);},5000);
+      }
+      if(generator.limit_switch&&!generator.button){
+        changeState(generator,"fail");
+      }
+      break;
+    case "transient":
+      if(!generator.limit_switch){
+        changeState(generator,"offline");
+        clearTimeout(timeout);
+      }
+      if(!generator.button){
+        changeState(generator,"fail");
+        clearTimeout(timeout);
+      }
+      break;
+    case "steady":
+      clearTimeout(timeout);
+      if((generator.limit_switch&&!generator.button)&&(grid_phase==1)){
+        changeState(generator,"lock");
+        console.log("lock");
+      }
+      if(!generator.limit_switch){
+        changeState(generator,"offline");
+      }
+      if ((!generator.button)&&(grid_phase==2||grid_phase==3||grid_phase==4)){
+        changeState(generator,"fail");
+        console.log("steady-fail-error");
+      }
+      break;
+      //ADD TICK
+
+    case "lock":
+      if(!generator.limit_switch){
+        changeState(generator,"offline");
+      }
+      break;
+    case "fail":
+      if (!generator.limit_switch){
+        changeState(generator,"offline");
+      }
+      break;
+  }
+}
+
 function gridPhase(){
   var startTime = Date.now();
   var interval = setInterval(function() {
@@ -216,10 +265,12 @@ function gridPhase(){
       }
   },10);
 }
+
 //Countdown and game
 function gameOver(){
 
 }
+
 // Timer countDown
 function countDown(Duration, func, id){
   var startTime = Date.now();
@@ -238,6 +289,7 @@ function countDown(Duration, func, id){
 var duration=9000;
 countDown(duration,gameOver,"time");
 gridPhase();
+checkGeneratorState();
 var startTime1 = Date.now();
 var interval = setInterval(function() {
       var elapsedTime = Date.now() - startTime1;
@@ -247,31 +299,49 @@ var interval = setInterval(function() {
         return changeDemand(Math.random()*25);
       }
   },10)
-var startTime2= Date.now();
-var interval2 = setInterval(function() {
-      var elapsedTime = Date.now() - startTime2;
-      var distance = 5000 - elapsedTime;
+// var startTime2= Date.now();
+// var interval2 = setInterval(function() {
+//       var elapsedTime = Date.now() - startTime2;
+//       var distance = 5000 - elapsedTime;
+//       if (distance <= 6) {
+//         startTime2=Date.now();
+//         return changeSupply(Math.random()*25);
+//       }
+//   },10)
+// var startTime3= Date.now();
+// var interval3 = setInterval(function() {
+//       var elapsedTime = Date.now() - startTime3;
+//       var distance = 5000 - elapsedTime;
+//       if (distance <= 6) {
+//         startTime3=Date.now();
+//         return changeState(gen1, "transient");
+//       }
+//   },10)
+// var startTime4= Date.now();
+// var interval4 = setInterval(function() {
+//       var elapsedTime = Date.now() - startTime4;
+//       var distance = 10000 - elapsedTime;
+//       if (distance <= 6) {
+//         startTime4=Date.now();
+//         return changeState(gen1, "offline");
+//       }
+//   },10)
+function checkGeneratorState(){
+  var startTime = Date.now();
+  var interval = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = 10 - elapsedTime;
       if (distance <= 6) {
-        startTime2=Date.now();
-        return changeSupply(Math.random()*25);
+        supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)+checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
+        changeSupply(supply);
+        startTime=Date.now();
+        generatorState(gen1);
+        generatorState(gen2);
+        generatorState(gen3);
+        generatorState(gen4);
+        generatorState(gen5);
+        generatorState(gen6);
       }
-  },10)
-var startTime3= Date.now();
-var interval3 = setInterval(function() {
-      var elapsedTime = Date.now() - startTime3;
-      var distance = 5000 - elapsedTime;
-      if (distance <= 6) {
-        startTime3=Date.now();
-        return changeState(gen1, "transient");
-      }
-  },10)
-var startTime4= Date.now();
-var interval4 = setInterval(function() {
-      var elapsedTime = Date.now() - startTime4;
-      var distance = 10000 - elapsedTime;
-      if (distance <= 6) {
-        startTime4=Date.now();
-        return changeState(gen1, "offline");
-      }
-  },10)
- 
+  },10);
+}
+

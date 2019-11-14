@@ -11,7 +11,7 @@ var temp;
 // Serial
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const ports = new SerialPort('COM5', { baudRate: 9600 });
+const ports = new SerialPort('COM10', { baudRate: 9600 });
 const parser = ports.pipe(new Readline({ delimiter: '\n' }));
 
 // Write Port to arduino if there is incoming message in mqtt topic serialOut
@@ -48,6 +48,7 @@ parser.on('data', data =>{
   temp=data;
   topic=temp.split("/");
 	client.publish(topic[0]+"/"+topic[1],topic[2].toString(),{retain: true});
-	console.log('got word from arduino:', data);
+	// console.log('got word from arduino:', data);
+  console.log(topic[0]+"/"+topic[1]+topic[2].toString());
 });
 
