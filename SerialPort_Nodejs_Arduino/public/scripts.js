@@ -158,7 +158,7 @@ function changeState(generator,state){
   }
   generator.state=state;
   serialOut(generator.number.toString+"/state/"+generator.state);
-  console.log("perubahan warna");
+  // console.log("perubahan warna");
 }
 
 function changeDemand(number){
@@ -209,7 +209,7 @@ function generatorState(generator){
     case "offline":
       if(generator.limit_switch&&generator.button){
         changeState(generator,"transient");
-        var timeout=setTimeout(function(){changeState(generator,"steady");clearTimeout(timeout);},5000);
+        var timeout=setTimeout(function(){changeState(generator,"steady");clearTimeout(timeout);},genertator.transient_time);
       }
       if(generator.limit_switch&&!generator.button){
         changeState(generator,"fail");
@@ -239,8 +239,6 @@ function generatorState(generator){
         console.log("steady-fail-error");
       }
       break;
-      //ADD TICK
-
     case "lock":
       if(!generator.limit_switch){
         changeState(generator,"offline");
