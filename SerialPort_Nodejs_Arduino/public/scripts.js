@@ -5,6 +5,7 @@ var demand=0;
 var score=0;
 var grid_phase=0;
 var duration=10000;
+var game=0;
 
 // Class Declaration
 class Generator {
@@ -264,6 +265,10 @@ function gridPhase(){
   },10);
 }
 
+function gameStart(){
+  game=1;
+}
+
 //Countdown and game
 function gameOver(){
 
@@ -283,63 +288,37 @@ function countDown(Duration, func, id){
   },10);
 }
 
-// MAIN
-var duration=9000;
-countDown(duration,gameOver,"time");
-gridPhase();
-checkGeneratorState();
-var startTime1 = Date.now();
-var interval = setInterval(function() {
-      var elapsedTime = Date.now() - startTime1;
-      var distance = 5000 - elapsedTime;
-      if (distance <= 6) {
-        startTime1=Date.now();
-        return changeDemand(Math.random()*25);
-      }
-  },10)
-// var startTime2= Date.now();
-// var interval2 = setInterval(function() {
-//       var elapsedTime = Date.now() - startTime2;
-//       var distance = 5000 - elapsedTime;
-//       if (distance <= 6) {
-//         startTime2=Date.now();
-//         return changeSupply(Math.random()*25);
-//       }
-//   },10)
-// var startTime3= Date.now();
-// var interval3 = setInterval(function() {
-//       var elapsedTime = Date.now() - startTime3;
-//       var distance = 5000 - elapsedTime;
-//       if (distance <= 6) {
-//         startTime3=Date.now();
-//         return changeState(gen1, "transient");
-//       }
-//   },10)
-// var startTime4= Date.now();
-// var interval4 = setInterval(function() {
-//       var elapsedTime = Date.now() - startTime4;
-//       var distance = 10000 - elapsedTime;
-//       if (distance <= 6) {
-//         startTime4=Date.now();
-//         return changeState(gen1, "offline");
-//       }
-//   },10)
 function checkGeneratorState(){
-  var startTime = Date.now();
-  var interval = setInterval(function() {
-      var elapsedTime = Date.now() - startTime;
-      var distance = 10 - elapsedTime;
-      if (distance <= 6) {
-        supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)+checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
-        changeSupply(supply);
-        startTime=Date.now();
-        generatorState(gen1);
-        generatorState(gen2);
-        generatorState(gen3);
-        generatorState(gen4);
-        generatorState(gen5);
-        generatorState(gen6);
-      }
-  },10);
+    var startTime = Date.now();
+    var interval = setInterval(function() {
+        var elapsedTime = Date.now() - startTime;
+        var distance = 10 - elapsedTime;
+        if (distance <= 6) {
+          supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)+checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
+          changeSupply(supply);
+          startTime=Date.now();
+          generatorState(gen1);
+          generatorState(gen2);
+          generatorState(gen3);
+          generatorState(gen4);
+          generatorState(gen5);
+          generatorState(gen6);
+        }
+    },10);
 }
-
+if(game){
+  // MAIN
+  var duration=9000;
+  countDown(duration,gameOver,"time");
+  gridPhase();
+  checkGeneratorState();
+  var startTime1 = Date.now();
+  var interval = setInterval(function() {
+        var elapsedTime = Date.now() - startTime1;
+        var distance = 5000 - elapsedTime;
+        if (distance <= 6) {
+          startTime1=Date.now();
+          return changeDemand(Math.random()*25);
+        }
+    },10)
+}
