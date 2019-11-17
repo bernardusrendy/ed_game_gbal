@@ -5,9 +5,7 @@ var demand=0;
 var score=0;
 var grid_phase=0;
 var duration=10000;
-<<<<<<< HEAD
 var game=0;
-=======
 var grid_phase_duration = 500;
 
 //Audio Files
@@ -21,7 +19,6 @@ var offline2Au =new Audio(); offline2Au.src = "/Audio/Offline2.wav";
 var tickAu =new Audio(); tickAu.src = "/Audio/Tick.wav";
 var tickUpAu =new Audio(); tickUpAu.src = "/Audio/TickUp.wav";
 var humAu =new Audio(); humAu.src = "Hum.wav"; humAu.loop = true;
->>>>>>> eb8e205b4b39441d6db5695fa62b5b3a1d4b89a5
 
 // Class Declaration
 class Generator {
@@ -342,7 +339,7 @@ function checkGeneratorState(){
         }
     },10);
 }
-<<<<<<< HEAD
+
 if(game){
   // MAIN
   var duration=9000;
@@ -359,5 +356,3 @@ if(game){
         }
     },10)
 }
-=======
->>>>>>> eb8e205b4b39441d6db5695fa62b5b3a1d4b89a5
