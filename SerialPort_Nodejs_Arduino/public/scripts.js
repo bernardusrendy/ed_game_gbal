@@ -5,6 +5,19 @@ var demand=0;
 var score=0;
 var grid_phase=0;
 var duration=10000;
+var grid_phase_duration = 500;
+
+//Audio Files
+var transientAu =new Audio(); transientAu.src = "/Audio/TransientFade.wav";
+var steadyAu =new Audio(); steadyAu.src = "/Audio/steady.wav";
+var lockAu =new Audio(); lockAu.src = "/Audio/Lock.wav";
+var failAu =new Audio(); failAu.src = "/Audio/Fail.wav";
+var fail2Au =new Audio(); fail2Au.src = "/Audio/Fail2.wav";
+var offlineAu =new Audio(); offlineAu.src = "/Audio/Offline.wav";
+var offline2Au =new Audio(); offline2Au.src = "/Audio/Offline2.wav";
+var tickAu =new Audio(); tickAu.src = "/Audio/Tick.wav";
+var tickUpAu =new Audio(); tickUpAu.src = "/Audio/TickUp.wav";
+var humAu =new Audio(); humAu.src = "Hum.wav"; humAu.loop = true;
 
 // Class Declaration
 class Generator {
@@ -30,12 +43,12 @@ class Main_Control{
 }
 
 // Object Call
-gen1 = new Generator(1,0.1,1,"offline",0,0,1);
-gen2 = new Generator(3,0.2,2,"offline",0,0,1);
-gen3 = new Generator(4,0.2,3,"offline",0,0,2);
-gen4 = new Generator(5,0.2,4,"offline",0,0,5000);
-gen5 = new Generator(7,0.3,5,"offline",0,0,3);
-gen6 = new Generator(12,0.4,6,"offline",0,0,4);
+gen1 = new Generator(1,0.1,1,"offline",0,0,1000);
+gen2 = new Generator(3,0.2,2,"offline",0,0,1000);
+gen3 = new Generator(4,0.2,3,"offline",0,0,2000);
+gen4 = new Generator(5,0.2,4,"offline",0,0,2000);
+gen5 = new Generator(7,0.3,5,"offline",0,0,2000);
+gen6 = new Generator(12,0.4,6,"offline",0,0,2000);
 
 // Server and broker address
 const brokerAddress = 'localhost'
@@ -141,20 +154,32 @@ function changeState(generator,state){
   else if(generator.state=="fail"){
     $(id).removeClass("bg-danger");
   }
+  //=================
   if(state=="offline"){
     $(id).addClass("bg-secondary");
+    transientAu.pause(); transientAu.currentTime = 0.0;
+    if(generator.state=="lock"){offline2Au.play();}
+    else {offlineAu.play();}
   }
   else if(state=="transient"){
     $(id).addClass("bg-warning");
+    transientAu.play();
   }
   else if(state=="steady"){
     $(id).addClass("bg-primary");
+    steadyAu.play();
   }
   else if(state=="lock"){
     $(id).addClass("bg-success");
+    lockAu.play();
   }
   else if(state=="fail"){
     $(id).addClass("bg-danger");
+    transientAu.pause(); transientAu.currentTime = 0.0;
+    if(generator.state=="offline"){offlineAu.currentTime = 0.0; offlineAu.play();}
+    else if(generator.state=="lock"){fail2Au.play();}
+    else {failAu.play();}
+
   }
   generator.state=state;
   serialOut(generator.number.toString+"/state/"+generator.state);
@@ -183,33 +208,41 @@ function inc_grid_phase(){
     $("#gp-2").removeClass("bg-warning").addClass("bg-success");
     $("#gp-3").removeClass("bg-warning").addClass("bg-success");
     $("#gp-4").removeClass("bg-warning").addClass("bg-success");
+    tickUpAu.play();
   }
   else if(grid_phase==2){
     $("#gp-2").removeClass("bg-success").addClass("bg-warning");
     $("#gp-1").removeClass("bg-warning").addClass("bg-success");
     $("#gp-3").removeClass("bg-warning").addClass("bg-success");
     $("#gp-4").removeClass("bg-warning").addClass("bg-success");
+    tickAu.play();
   }
   else if(grid_phase==3){
     $("#gp-3").removeClass("bg-success").addClass("bg-warning");
     $("#gp-2").removeClass("bg-warning").addClass("bg-success");
     $("#gp-1").removeClass("bg-warning").addClass("bg-success");
     $("#gp-4").removeClass("bg-warning").addClass("bg-success");
+    tickAu.play();
   }
   else if(grid_phase==4){
     $("#gp-4").removeClass("bg-success").addClass("bg-warning");
     $("#gp-2").removeClass("bg-warning").addClass("bg-success");
     $("#gp-3").removeClass("bg-warning").addClass("bg-success");
     $("#gp-1").removeClass("bg-warning").addClass("bg-success");
+    tickAu.play();
   }
 }
 
 function generatorState(generator){
   switch(generator.state){
     case "offline":
+      clearTimeout(timeout);
       if(generator.limit_switch&&generator.button){
         changeState(generator,"transient");
-        var timeout=setTimeout(function(){changeState(generator,"steady");clearTimeout(timeout);},genertator.transient_time);
+        var timeout=setTimeout(function(){
+          if(generator.state= "transient"){
+            changeState(generator,"steady");clearTimeout(timeout);
+          }},generator.transient_time);
       }
       if(generator.limit_switch&&!generator.button){
         changeState(generator,"fail");
@@ -256,7 +289,7 @@ function gridPhase(){
   var startTime = Date.now();
   var interval = setInterval(function() {
       var elapsedTime = Date.now() - startTime;
-      var distance = 1000 - elapsedTime;
+      var distance = grid_phase_duration - elapsedTime;
       if (distance <= 6) {
         startTime=Date.now();
         return inc_grid_phase();
@@ -342,4 +375,3 @@ function checkGeneratorState(){
       }
   },10);
 }
-
