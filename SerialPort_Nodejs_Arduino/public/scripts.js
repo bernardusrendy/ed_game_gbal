@@ -288,7 +288,7 @@ function generatorState(generator){
 
 function gridPhase(){
   var startTime = Date.now();
-  var interval = setInterval(function() {
+  intervalGrid = setInterval(function() {
       var elapsedTime = Date.now() - startTime;
       var distance = grid_phase_duration - elapsedTime;
       if (distance <= 6) {
@@ -298,24 +298,30 @@ function gridPhase(){
   },10);
 }
 
-function gameStart(){
+
+document.getElementById("mulai").onclick = function gameStart(){
   game=1;
+  console.log("game Started");
+}
+document.getElementById("stop").onclick = function gameOverClicked(){
+  gameOver();
 }
 
 //Countdown and game
 function gameOver(){
-
+  game=-1;
+  console.log("game Stopped");
 }
 
 // Timer countDown
 function countDown(Duration, func, id){
   var startTime = Date.now();
-  var interval = setInterval(function() {
+  intervalCount = setInterval(function() {
       var elapsedTime = Date.now() - startTime;
       var distance = Duration - elapsedTime;
       document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
       if (distance <= 6) {
-        clearInterval(interval);
+        clearInterval(intervalCount);
         return func();
       }
   },10);
@@ -340,19 +346,46 @@ function checkGeneratorState(){
     },10);
 }
 
-if(game){
-  // MAIN
-  var duration=9000;
-  countDown(duration,gameOver,"time");
-  gridPhase();
-  checkGeneratorState();
-  var startTime1 = Date.now();
-  var interval = setInterval(function() {
-        var elapsedTime = Date.now() - startTime1;
-        var distance = 5000 - elapsedTime;
-        if (distance <= 6) {
-          startTime1=Date.now();
-          return changeDemand(Math.random()*25);
-        }
-    },10)
+// Microcontroller like setup and loop
+setup();
+var startTime = Date.now();
+var interval = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = 50- elapsedTime;
+      if (distance <= 6) {
+        startTime=Date.now();
+        return loop();
+      }
+  },10)
+var intervalDemand;
+var intervalCount;
+var intervalGrid;
+
+function setup(){
+
+}
+
+function loop(){
+  if(game==1){
+    game=0;
+    var duration=9000;
+    countDown(duration,gameOver,"time");
+    gridPhase();
+    checkGeneratorState();
+    var startTime1 = Date.now();
+    intervalDemand = setInterval(function() {
+          var elapsedTime = Date.now() - startTime1;
+          var distance = 5000 - elapsedTime;
+          if (distance <= 6) {
+            startTime1=Date.now();
+            return changeDemand(Math.random()*25);
+          }
+      },10)
+  }
+  else if (game==-1){
+    game=0;
+    clearInterval(intervalDemand);
+    clearInterval(intervalGrid);
+    clearInterval(intervalCount);
+  }
 }
