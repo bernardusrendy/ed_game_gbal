@@ -8,7 +8,9 @@ var offlineAu =new Audio(); offlineAu.src = "/Audio/Offline.wav";
 var offline2Au =new Audio(); offline2Au.src = "/Audio/Offline2.wav";
 var tickAu =new Audio(); tickAu.src = "/Audio/Tick.wav";
 var tickUpAu =new Audio(); tickUpAu.src = "/Audio/TickUp.wav";
-var humAu =new Audio(); humAu.src = "Hum.wav"; humAu.loop = true;
+var threeTwoOneAu =new Audio(); threeTwoOneAu.src = "/Audio/321.wav"; threeTwoOneAu.loop = true;
+var humAu =new Audio(); humAu.src = "/Audio/Hum.wav"; humAu.loop = true;
+var heartBeatAu =new Audio(); heartBeatAu.src = "/Audio/Heartbeat.mp3"; heartBeatAu.loop = true;
 
 // ***********************************************************************OBJECT ORIENTED DECLARATION**************************************************** //
 
@@ -271,10 +273,8 @@ function generatorState(generator){
 }
 
 function gameStart(){
-  clearInterval(intervalGrid);
   game=1;
   console.log("Game Started");
-  gridPhase();
 }
 
 function gameOver(){
@@ -289,7 +289,8 @@ function randomPower(generator,floor,range){
 function randomDemand(minimumOn){
   powerArray=[gen1.power,gen2.power,gen3.power,gen4.power,gen5.power,gen6.power];
   totalDemand=0;
-  do{  
+  do{
+    on=0;  
     for (i=0;i<6;i++){
       randomizerArray[i]=Math.round(Math.random());
     }
@@ -309,6 +310,7 @@ function randomDemand(minimumOn){
 }
 
 function round(minimumOn,duration){
+  gridPhase();
   clearInterval(intervalCount);
   randomPower(gen1,3,4);
   randomPower(gen2,5,4);
@@ -317,7 +319,7 @@ function round(minimumOn,duration){
   randomPower(gen5,9,2);
   randomPower(gen6,11,2);
   randomDemand(minimumOn);
-  countDown(duration,gameOver,"time");
+  countDown(duration+3000*on,gameOver,"time");
 }
 
 // ***********************************************************************HTML EVENT HANDLER**************************************************** //
@@ -330,7 +332,58 @@ document.getElementById("stop").onclick = function gameOverClicked(){
   gameOver();
 }
 
+function gameOverModal(win,roundNumber){
+  $('#gameOverModal').modal('show');
+  if (win==1){
+    document.getElementById("winModal").innerHTML = "Selamat Anda Berhasil Menyediakan Energi Untuk Indonesia!!!";
+    document.getElementById("roundResultModal").innerHTML = roundNumber; 
+  }
+  else {
+    document.getElementById("winModal").innerHTML = "\"Jangan Pernah Menyerah, Kegigihan Selalu Membuahkan Hasil!\" - Petuah Bijak"; 
+    document.getElementById("roundResultModal").innerHTML = roundNumber-1;
+  }
+}
+
 // ***********************************************************************INTERVAL THREADS**************************************************** //
+
+// Transition Counter Interval
+function transitionCounter(duration){
+  var startTime = Date.now();
+  intervalModalCounter = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = duration - elapsedTime;
+      document.getElementById("modalCounter").innerHTML = Math.ceil(distance / 1000);
+      if (distance <= 6) {
+        document.getElementById("modalCounter").innerHTML = 0;
+        clearInterval(intervalModalCounter);
+        }
+      },10);
+}
+
+// Transition Modal Interval
+function transitionModal(duration){
+  roundNumber++;
+  threeTwoOneAu.play();
+  $('#transitionModal').modal('show');
+  document.getElementById("transitionModalRoundNumber").innerHTML = roundNumber;
+  clearInterval(intervalGrid);
+  $("#gp-1").removeClass("bg-success").addClass("bg-warning");
+  $("#gp-2").removeClass("bg-warning").addClass("bg-success");
+  $("#gp-3").removeClass("bg-warning").addClass("bg-success");
+  $("#gp-4").removeClass("bg-warning").addClass("bg-success");
+  grid_phase=1;
+  var startTime = Date.now();
+  intervalModal = setInterval(function() {
+      var elapsedTime = Date.now() - startTime;
+      var distance = duration - elapsedTime;
+      if (distance <= 6) {
+        $('#transitionModal').modal('hide');
+        clearInterval(intervalModal);
+        game=2;
+        threeTwoOneAu.pause();
+        }
+      },10);
+}
 
 // CheckRound interval check
 function checkRound(){
@@ -340,10 +393,15 @@ function checkRound(){
       var distance = 30 - elapsedTime;
       if (distance <= 6) {
         startTime=Date.now();
-        if(demand==supply){
+        if((demand==supply)&&(roundNumber!=5)){
           clearInterval(intervalCheckRound);
-          roundNumber++;
-          game=2;
+          transitionModal(3000);
+          transitionCounter(3000);
+        }
+        else if ((demand==supply)&&(roundNumber==5)){
+          clearInterval(intervalCheckRound);
+          win=1;
+          game=-1;
         }
       }
   },10);
@@ -364,6 +422,8 @@ function gridPhase(){
 
 // Timer countDown interval
 function countDown(duration, func, id){
+  heartBeatAu.currentTime = 10.0;
+  heartBeatAu.play();
   var startTime = Date.now();
   intervalCount = setInterval(function() {
       var elapsedTime = Date.now() - startTime;
@@ -371,7 +431,12 @@ function countDown(duration, func, id){
       document.getElementById(id).innerHTML = (distance / 1000).toFixed(2);
       if (distance <= 10) {
         clearInterval(intervalCount);
+        heartBeatAu.pause();
         return func();
+      }
+      if (distance <= 5000) {
+        heartBeatAu.playbackRate=2.0;
+        heartBeatAu.volume=5.0;
       }
   },5);
 }
@@ -418,6 +483,8 @@ var powerArray=[gen1.power,gen2.power,gen3.power,gen4.power,gen5.power,gen6.powe
 var intervalCount;
 var intervalGrid;
 var intervalCheckRound;
+var intervalModal;
+var intervalModalCounter;
 
 // Microcontroller like setup and loop
 setup();
@@ -439,47 +506,63 @@ function loop(){
   // game==0 means the game is on idle event handling, no loop will be executed (reduces program's load)
   // game==1 means event handler senses Game Started
   if(game==1){
-    game=2;
-    roundNumber=1;
-  }
-  // game==2 means event handler senses Round Changes
-  else if(game==2){
-    game=0;
-    document.getElementById("roundNumber").innerHTML = roundNumber.toString();
-    if (roundNumber==1){
-      round(1,10000);
-    }
-    else if (roundNumber==2){
-      round(2,9000);
-    }
-    else if (roundNumber==3){
-      round(3,9000);
-    }
-    else if (roundNumber==4){
-      round(3,7000);
-    }
-    else if (roundNumber==5){
-      round(3,6000);
-    }
-    else if (roundNumber==6){
-      win=1;
-      gameOver();
-    }
-  }
-  // game==-1 means event handler senses Game Stopped
-  else if (game==-1){
-    game=0;
+    // Reset
     document.getElementById("time").innerHTML = "0.00";
     roundNumber=0;
     clearInterval(intervalGrid);
     clearInterval(intervalCount);
     clearInterval(intervalCheckRound);
+    clearInterval(intervalModalCounter);
+    clearInterval(intervalModal);
     grid_phase=1;
     $("#gp-1").removeClass("bg-success").addClass("bg-warning");
     $("#gp-2").removeClass("bg-warning").addClass("bg-success");
     $("#gp-3").removeClass("bg-warning").addClass("bg-success");
     $("#gp-4").removeClass("bg-warning").addClass("bg-success");
-    // ADD SHOW WIN OR LOSE IN WHAT ROUND in bootstrap popup modal? Sound effects
+    win=0;
+    game=0;
+    transitionModal(3000);
+    transitionCounter(3000);
+  }
+  // game==2 means event handler senses Round Changes after interval modal done
+  else if(game==2){
+    game=0;
+    document.getElementById("roundNumber").innerHTML = roundNumber.toString();
+    if (roundNumber==1){
+      round(1,13000);
+    }
+    else if (roundNumber==2){
+      round(2,12000);
+    }
+    else if (roundNumber==3){
+      round(3,11000);
+    }
+    else if (roundNumber==4){
+      round(3,10000);
+    }
+    else if (roundNumber==5){
+      round(3,9000);
+    }
+  }
+  // game==-1 means event handler senses Game Stopped
+  else if (game==-1){
+    game=0;
+    // Show modal of result (win or lose at what round)
+    gameOverModal(win,roundNumber);
+    // Reset everything
+    document.getElementById("time").innerHTML = "0.00";
+    roundNumber=0;
+    clearInterval(intervalGrid);
+    clearInterval(intervalCount);
+    clearInterval(intervalCheckRound);
+    clearInterval(intervalModalCounter);
+    clearInterval(intervalModal);
+    grid_phase=1;
+    $("#gp-1").removeClass("bg-success").addClass("bg-warning");
+    $("#gp-2").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-3").removeClass("bg-warning").addClass("bg-success");
+    $("#gp-4").removeClass("bg-warning").addClass("bg-success");
     win=0;
   }
 }
+// SOUND EFFECT + BACKGROUND SOUND EFFECT
