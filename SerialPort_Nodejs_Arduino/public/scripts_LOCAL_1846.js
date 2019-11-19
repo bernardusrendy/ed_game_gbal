@@ -29,12 +29,12 @@ class Generator {
 }
 
 // Object Call
-gen1 = new Generator(1,0.1,1,1000,"offline");
-gen2 = new Generator(3,0.2,2,1000,"offline");
-gen3 = new Generator(4,0.2,3,2000,"offline");
-gen4 = new Generator(5,0.2,4,2000,"offline");
-gen5 = new Generator(7,0.3,5,2000,"offline");
-gen6 = new Generator(12,0.4,6,2000,"offline");
+gen1 = new Generator(1,0.1,1,1000);
+gen2 = new Generator(3,0.2,2,1000);
+gen3 = new Generator(4,0.2,3,2000);
+gen4 = new Generator(5,0.2,4,2000);
+gen5 = new Generator(7,0.3,5,2000);
+gen6 = new Generator(12,0.4,6,2000);
 
 // ***********************************************************************MQTT AND SERIAL COMMUNICATION PERIPHERALS**************************************************** //
 
@@ -440,10 +440,7 @@ function countDown(duration, func, id){
       }
       if (distance <= 5000) {
         heartBeatAu.playbackRate=2.0;
-<<<<<<< Updated upstream
         heartBeatAu.volume=0.5;
-=======
->>>>>>> Stashed changes
       }
   },5);
 }
@@ -494,6 +491,7 @@ var intervalModal;
 var intervalModalCounter;
 
 // Microcontroller like setup and loop
+setup();
 var startTime = Date.now();
 var interval = setInterval(function() {
       var elapsedTime = Date.now() - startTime;
@@ -503,7 +501,10 @@ var interval = setInterval(function() {
         return loop();
       }
   },10)
-checkGeneratorState();
+
+function setup(){
+  checkGeneratorState();
+}
 
 function loop(){
   // game==0 means the game is on idle event handling, no loop will be executed (reduces program's load)

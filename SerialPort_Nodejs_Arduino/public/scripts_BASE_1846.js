@@ -24,17 +24,16 @@ class Generator {
     this.button = button;
     this.limit_switch = limit_switch;
     this.transient_time = transient_time;
-    this.state = "offline";
   }
 }
 
 // Object Call
-gen1 = new Generator(1,0.1,1,1000,"offline");
-gen2 = new Generator(3,0.2,2,1000,"offline");
-gen3 = new Generator(4,0.2,3,2000,"offline");
-gen4 = new Generator(5,0.2,4,2000,"offline");
-gen5 = new Generator(7,0.3,5,2000,"offline");
-gen6 = new Generator(12,0.4,6,2000,"offline");
+gen1 = new Generator(1,0.1,1,1000);
+gen2 = new Generator(3,0.2,2,1000);
+gen3 = new Generator(4,0.2,3,2000);
+gen4 = new Generator(5,0.2,4,2000);
+gen5 = new Generator(7,0.3,5,2000);
+gen6 = new Generator(12,0.4,6,2000);
 
 // ***********************************************************************MQTT AND SERIAL COMMUNICATION PERIPHERALS**************************************************** //
 
@@ -291,7 +290,7 @@ function randomDemand(minimumOn){
   powerArray=[gen1.power,gen2.power,gen3.power,gen4.power,gen5.power,gen6.power];
   totalDemand=0;
   do{
-    on=0;
+    on=0;  
     for (i=0;i<6;i++){
       randomizerArray[i]=Math.round(Math.random());
     }
@@ -300,7 +299,7 @@ function randomDemand(minimumOn){
         on++;
       }
     }
-  }
+  } 
   while (on<minimumOn);
   for (i=0;i<6;i++){
     if(randomizerArray[i]==1){
@@ -337,10 +336,10 @@ function gameOverModal(win,roundNumber){
   $('#gameOverModal').modal('show');
   if (win==1){
     document.getElementById("winModal").innerHTML = "Selamat Anda Berhasil Menyediakan Energi Untuk Indonesia!!!";
-    document.getElementById("roundResultModal").innerHTML = roundNumber;
+    document.getElementById("roundResultModal").innerHTML = roundNumber; 
   }
   else {
-    document.getElementById("winModal").innerHTML = "\"Jangan Pernah Menyerah, Kegigihan Selalu Membuahkan Hasil!\" - Petuah Bijak";
+    document.getElementById("winModal").innerHTML = "\"Jangan Pernah Menyerah, Kegigihan Selalu Membuahkan Hasil!\" - Petuah Bijak"; 
     document.getElementById("roundResultModal").innerHTML = roundNumber-1;
   }
 }
@@ -365,7 +364,6 @@ function transitionCounter(duration){
 function transitionModal(duration){
   roundNumber++;
   threeTwoOneAu.play();
-  // checkRound();
   $('#transitionModal').modal('show');
   document.getElementById("transitionModalRoundNumber").innerHTML = roundNumber;
   clearInterval(intervalGrid);
@@ -395,17 +393,15 @@ function checkRound(){
       var distance = 30 - elapsedTime;
       if (distance <= 6) {
         startTime=Date.now();
-        if((demand==supply)&&(roundNumber!=5)&&(supply!=0)){
+        if((demand==supply)&&(roundNumber!=5)){
           clearInterval(intervalCheckRound);
           transitionModal(3000);
           transitionCounter(3000);
-          console.log("next round");
         }
-        else if ((demand==supply)&&(roundNumber==5)&&(supply!=0)){
+        else if ((demand==supply)&&(roundNumber==5)){
           clearInterval(intervalCheckRound);
           win=1;
           game=-1;
-          console.log("You Win");
         }
       }
   },10);
@@ -440,10 +436,7 @@ function countDown(duration, func, id){
       }
       if (distance <= 5000) {
         heartBeatAu.playbackRate=2.0;
-<<<<<<< Updated upstream
-        heartBeatAu.volume=0.5;
-=======
->>>>>>> Stashed changes
+        heartBeatAu.volume=5.0;
       }
   },5);
 }
@@ -494,16 +487,20 @@ var intervalModal;
 var intervalModalCounter;
 
 // Microcontroller like setup and loop
+setup();
 var startTime = Date.now();
 var interval = setInterval(function() {
       var elapsedTime = Date.now() - startTime;
       var distance = 30- elapsedTime;
       if (distance <= 6) {
-        startTime=Date.now();
+        startTime=Date.now(); 
         return loop();
       }
   },10)
-checkGeneratorState();
+
+function setup(){
+  checkGeneratorState();
+}
 
 function loop(){
   // game==0 means the game is on idle event handling, no loop will be executed (reduces program's load)
