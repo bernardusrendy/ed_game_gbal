@@ -24,6 +24,7 @@ class Generator {
     this.button = button;
     this.limit_switch = limit_switch;
     this.transient_time = transient_time;
+    this.state = "offline";
   }
 }
 
@@ -290,7 +291,7 @@ function randomDemand(minimumOn){
   powerArray=[gen1.power,gen2.power,gen3.power,gen4.power,gen5.power,gen6.power];
   totalDemand=0;
   do{
-    on=0;  
+    on=0;
     for (i=0;i<6;i++){
       randomizerArray[i]=Math.round(Math.random());
     }
@@ -299,7 +300,7 @@ function randomDemand(minimumOn){
         on++;
       }
     }
-  } 
+  }
   while (on<minimumOn);
   for (i=0;i<6;i++){
     if(randomizerArray[i]==1){
@@ -336,10 +337,10 @@ function gameOverModal(win,roundNumber){
   $('#gameOverModal').modal('show');
   if (win==1){
     document.getElementById("winModal").innerHTML = "Selamat Anda Berhasil Menyediakan Energi Untuk Indonesia!!!";
-    document.getElementById("roundResultModal").innerHTML = roundNumber; 
+    document.getElementById("roundResultModal").innerHTML = roundNumber;
   }
   else {
-    document.getElementById("winModal").innerHTML = "\"Jangan Pernah Menyerah, Kegigihan Selalu Membuahkan Hasil!\" - Petuah Bijak"; 
+    document.getElementById("winModal").innerHTML = "\"Jangan Pernah Menyerah, Kegigihan Selalu Membuahkan Hasil!\" - Petuah Bijak";
     document.getElementById("roundResultModal").innerHTML = roundNumber-1;
   }
 }
@@ -364,6 +365,7 @@ function transitionCounter(duration){
 function transitionModal(duration){
   roundNumber++;
   threeTwoOneAu.play();
+  // checkRound();
   $('#transitionModal').modal('show');
   document.getElementById("transitionModalRoundNumber").innerHTML = roundNumber;
   clearInterval(intervalGrid);
@@ -393,15 +395,17 @@ function checkRound(){
       var distance = 30 - elapsedTime;
       if (distance <= 6) {
         startTime=Date.now();
-        if((demand==supply)&&(roundNumber!=5)){
+        if((demand==supply)&&(roundNumber!=5)&&(supply!=0)){
           clearInterval(intervalCheckRound);
           transitionModal(3000);
           transitionCounter(3000);
+          console.log("next round");
         }
-        else if ((demand==supply)&&(roundNumber==5)){
+        else if ((demand==supply)&&(roundNumber==5)&&(supply!=0)){
           clearInterval(intervalCheckRound);
           win=1;
           game=-1;
+          console.log("You Win");
         }
       }
   },10);
@@ -436,7 +440,7 @@ function countDown(duration, func, id){
       }
       if (distance <= 5000) {
         heartBeatAu.playbackRate=2.0;
-        heartBeatAu.volume=5.0;
+        heartBeatAu.volume=0.5;
       }
   },5);
 }
@@ -493,7 +497,7 @@ var interval = setInterval(function() {
       var elapsedTime = Date.now() - startTime;
       var distance = 30- elapsedTime;
       if (distance <= 6) {
-        startTime=Date.now(); 
+        startTime=Date.now();
         return loop();
       }
   },10)
