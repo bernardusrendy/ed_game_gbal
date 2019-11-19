@@ -9,7 +9,6 @@ var offline2Au =new Audio(); offline2Au.src = "/Audio/Offline2.wav";
 var tickAu =new Audio(); tickAu.src = "/Audio/Tick.wav";
 var tickUpAu =new Audio(); tickUpAu.src = "/Audio/TickUp.wav";
 var threeTwoOneAu =new Audio(); threeTwoOneAu.src = "/Audio/321.wav"; threeTwoOneAu.loop = true;
-var humAu =new Audio(); humAu.src = "/Audio/Hum.wav"; humAu.loop = true;
 var heartBeatAu =new Audio(); heartBeatAu.src = "/Audio/Heartbeat.mp3"; heartBeatAu.loop = true;
 
 // ***********************************************************************OBJECT ORIENTED DECLARATION**************************************************** //
@@ -25,6 +24,9 @@ class Generator {
     this.limit_switch = limit_switch;
     this.transient_time = transient_time;
     this.state = "offline";
+    this.humTemp = 0;
+    this.humAu = new Audio(); 
+    this.humAu.src = "/Audio/Hum.wav";
   }
 }
 
@@ -230,14 +232,30 @@ function generatorState(generator){
     case "offline":
       clearTimeout(timeout);
       if(generator.limit_switch&&generator.button){
+        if(generator.humTemp==1){
+          generator.humTemp=0;  
+          generator.humAu.pause();
+        } 
         changeState(generator,"transient");
         var timeout=setTimeout(function(){
           if(generator.state= "transient"){
             changeState(generator,"steady");clearTimeout(timeout);
           }},generator.transient_time);
       }
-      if(generator.limit_switch&&!generator.button){
+      else if(generator.limit_switch&&!generator.button){
         changeState(generator,"fail");
+      }
+      else if(!generator.limit_switch&&generator.button){
+        if(generator.humTemp==0){
+          generator.humTemp=1;  
+          generator.humAu.play();
+        }
+      }
+      else if(!generator.limit_switch&&!generator.button){
+       if(generator.humTemp==1){
+          generator.humTemp=0;  
+          generator.humAu.pause();
+        }  
       }
       break;
     case "transient":
@@ -489,6 +507,7 @@ var on=0;
 var i=0;
 var totalDemand=0;
 var powerArray=[gen1.power,gen2.power,gen3.power,gen4.power,gen5.power,gen6.power];
+var humTemp=0;
 
 // Interval Purpose Global Variables
 var intervalCount;
