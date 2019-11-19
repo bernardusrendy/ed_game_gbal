@@ -29,12 +29,12 @@ class Generator {
 }
 
 // Object Call
-gen1 = new Generator(1,0.1,1,1000,"offline");
-gen2 = new Generator(3,0.2,2,1000,"offline");
-gen3 = new Generator(4,0.2,3,2000,"offline");
-gen4 = new Generator(5,0.2,4,2000,"offline");
-gen5 = new Generator(7,0.3,5,2000,"offline");
-gen6 = new Generator(12,0.4,6,2000,"offline");
+gen1 = new Generator(1,0.1,1,1000);
+gen2 = new Generator(3,0.2,2,1000);
+gen3 = new Generator(4,0.2,3,2000);
+gen4 = new Generator(5,0.2,4,2000);
+gen5 = new Generator(7,0.3,5,2000);
+gen6 = new Generator(12,0.4,6,2000);
 
 // ***********************************************************************MQTT AND SERIAL COMMUNICATION PERIPHERALS**************************************************** //
 
@@ -124,6 +124,8 @@ function serialOut(message){
 function changePower(generator,power){
   id="power_"+generator.number.toString();
   generator.power=power;
+  supply=checkSupply(gen1.power,gen1.state)+checkSupply(gen2.power,gen2.state)+checkSupply(gen3.power,gen3.state)+checkSupply(gen4.power,gen4.state)+checkSupply(gen5.power,gen5.state)+checkSupply(gen6.power,gen6.state);
+  changeSupply(supply);
   document.getElementById(id).innerHTML = generator.power.toString();
 }
 
@@ -178,6 +180,8 @@ function changeDemand(number){
   demand=number;
   document.getElementById("demand").innerHTML = number.toFixed(2).toString();
   document.getElementById("demand_bar").style.width = (number*4).toString()+"%";
+  console.log("Demand Adalah");
+  console.log(demand);
 }
 
 function changeSupply(number){
@@ -312,6 +316,7 @@ function randomDemand(minimumOn){
 
 function round(minimumOn,duration){
   gridPhase();
+  checkRound();
   clearInterval(intervalCount);
   randomPower(gen1,3,4);
   randomPower(gen2,5,4);
@@ -325,7 +330,7 @@ function round(minimumOn,duration){
 
 // ***********************************************************************HTML EVENT HANDLER**************************************************** //
 
-document.getElementById("mulai").onclick = function gameOverClicked(){
+document.getElementById("mulai").onclick = function gameStartClicked(){
   gameStart();
 }
 
@@ -364,8 +369,8 @@ function transitionCounter(duration){
 // Transition Modal Interval
 function transitionModal(duration){
   roundNumber++;
+  console.log("roundNumber++");
   threeTwoOneAu.play();
-  // checkRound();
   $('#transitionModal').modal('show');
   document.getElementById("transitionModalRoundNumber").innerHTML = roundNumber;
   clearInterval(intervalGrid);
@@ -397,15 +402,17 @@ function checkRound(){
         startTime=Date.now();
         if((demand==supply)&&(roundNumber!=5)&&(supply!=0)){
           clearInterval(intervalCheckRound);
+          clearInterval(intervalCount);
           transitionModal(3000);
           transitionCounter(3000);
-          console.log("next round");
+          console.log("Next round");
         }
         else if ((demand==supply)&&(roundNumber==5)&&(supply!=0)){
           clearInterval(intervalCheckRound);
+          clearInterval(intervalCount);
           win=1;
           game=-1;
-          console.log("You Win");
+          console.log("Game Over Karena CheckRound");
         }
       }
   },10);
@@ -436,14 +443,11 @@ function countDown(duration, func, id){
       if (distance <= 10) {
         clearInterval(intervalCount);
         heartBeatAu.pause();
+        console.log("akibat Countdown");
         return func();
       }
       if (distance <= 5000) {
         heartBeatAu.playbackRate=2.0;
-<<<<<<< Updated upstream
-        heartBeatAu.volume=0.5;
-=======
->>>>>>> Stashed changes
       }
   },5);
 }
