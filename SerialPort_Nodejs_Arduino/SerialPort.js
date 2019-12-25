@@ -11,7 +11,7 @@ var temp;
 // Serial
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const ports = new SerialPort('COM10', { baudRate: 9600 });
+const ports = new SerialPort('COM8', { baudRate: 9600 });
 const parser = ports.pipe(new Readline({ delimiter: '\n' }));
 
 // Write Port to arduino if there is incoming message in mqtt topic serialOut

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Client Js -->
+    <script src="/mqtt.js"></script>
+    <script src="./jquery-3.3.1.slim.min.js"></script>
+    <script src="./bootstrap.min.js"></script>
+    <!-- Client CSS -->
+    <link rel="stylesheet" href="./style.css"/>
+    <link rel="stylesheet" href="./bootstrap.min.css">
+
+    <title>Generator Balancing</title>
+  </head>
+  <body>
+    <div class="container" style="height: 100%">
+      <div class="row p-4" style="height: 100px">
+        <div id="round" class="col-sm">
+          <h1>ROUND <span id="roundNumber">-</span></h1>
+        </div>
+        <button type="button" id="mulai" class="btn btn-primary btn-lg" onclick="gameStart()">Mulai</button>
+        <button type="button" id="stop" class="btn btn-secondary btn-lg" onclick="gameOverClicked()">Stop</button>
+        <div class="col-sm-3">
+          <h1>TIME | <span id="time">0.00</span> </h1>
+        </div>
+      </div>
+
+      <div style="height: 300px">
+        <div class="p-1" style="height: 50% ">
+          <div class="progress" style="height: 100%; width: 100%">
+            <div id="demand_bar" class="progress-bar progress-bar-striped bg-warning text-dark" role="progressbar"
+            aria-valuenow="0" aria-valuemin="0" aria-valuemax="25" style="width: 30%">
+              <p id="demand" style="font-size: 10em; font-weight: bold">30</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-1" style="height: 50% ">
+          <div class="progress " style="height: 100%; width: 100%">
+            <div id="supply_bar" class="progress-bar progress-bar-striped progress-bar-animated text-dark" role="progressbar"
+            aria-valuenow="0" aria-valuemin="0" aria-valuemax="25" style="width: 100%">
+              <p id="supply" style="font-size: 10em; font-weight: bold">25</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-1" style="width: 100%">
+        <div class="progress" style="width: 100%; height: 50px">
+          <div id="gp-1" class="progress-bar bg-warning bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">1</div>
+          <div id="gp-2" class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">2</div>
+          <div id="gp-3" class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">3</div>
+          <div id="gp-4" class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">4</div>
+        </div>
+      </div>
+      <div class="row" style="height: 150px">
+        <div id="state_1" class="col-sm bg-secondary text-white rounded m-1 p-2 text-center">
+          <h4>Surya</h4>
+          <h1 id="power_1">3</h1>
+        </div>
+        <div id="state_2" class="col-sm bg-secondary text-white rounded m-1 p-2 text-center">
+          <h4>Angin</h4>
+          <h1 id="power_2">3</h1>
+        </div>
+        <div id="state_3" class="col-sm bg-secondary text-white rounded m-1 p-2 text-center">
+          <h4>Air</h4>
+          <h1 id="power_3">3</h1>
+        </div>
+        <div id="state_4" class="col-sm bg-secondary text-white rounded m-1 p-2 text-center">
+          <h4>Geothermal</h4>
+          <h1 id="power_4">3</h1>
+        </div>
+        <div id="state_5" class="col-sm bg-secondary text-white rounded m-1 p-2 text-center">
+          <h4>Diesel</h4>
+          <h1 id="power_5">3</h1>
+        </div>
+        <div id="state_6" class="col-sm bg-secondary text-white rounded m-1 p-2 text-center">
+          <h4>Batubara</h4>
+          <h1 id="power_6">3</h1>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- transitionModal -->
+    <div class="modal" id="transitionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title text-center" id="exampleModalLongTitle">ROUND <span id="transitionModalRoundNumber"></span></h1>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h1 class="text-center">IN</h1>
+            <h1 class="text-center" id="modalCounter"></h1>
+          </div>
+          <div class="modal-footer">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- gameOverModal -->
+    <div class="modal" id="gameOverModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title text-center" id="exampleModalLongTitle">Permainan Selesai</h1>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h2 class="text-center">Anda Berhasil Menyelesaikan <span id="roundResultModal"></span> Round!</h2>
+            <h3 class="text-center" id="winModal"></h3>
+          </div>
+          <div class="modal-footer">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script> -->
+    <script src="./scripts.js"></script>
+  </body>
+</html>
